@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp - Beauty Reviews</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #F2A7B4;
+    --rose-deep: #C96B80;
+    --cream: #FDF6EE;
+    --sand: #E8DDD0;
+    --espresso: #3B2A2A;
+    --taupe: #8A7567;
+    --gold: #C9A96B;
+    --mint: #B4D8C4;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--cream);
+    color: var(--espresso);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--cream);
+    border-bottom: 1px solid var(--sand);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--espresso);
+    letter-spacing: -0.02em;
+  }
+
+  .logo span { color: var(--rose-deep); font-style: italic; }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+  .nav-links a {
+    font-size: 0.875rem;
+    color: var(--taupe);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--rose-deep); }
+
+  .nav-search {
+    display: flex;
+    align-items: center;
+    background: var(--sand);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--taupe);
+    cursor: pointer;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #F7EBE8 0%, #EDD8D0 50%, #F2E8EC 100%);
+    padding: 5rem 2.5rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: white;
+    border: 1px solid var(--rose);
+    border-radius: 999px;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--rose-deep);
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    line-height: 1.1;
+    color: var(--espresso);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title em { color: var(--rose-deep); font-style: italic; }
+
+  .hero-desc {
+    color: var(--taupe);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 420px;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--espresso);
+    color: white;
+    padding: 0.85rem 1.75rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .hero-cta:hover { background: var(--rose-deep); transform: translateY(-1px); }
+
+  .hero-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .hero-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 24px rgba(59,42,42,0.06);
+    position: relative;
+  }
+
+  .hero-card:first-child { margin-top: 2rem; }
+  .hero-card:last-child { margin-top: -1rem; }
+
+  .product-emoji { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+  .product-brand { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--taupe); margin-bottom: 0.2rem; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--espresso); margin-bottom: 0.5rem; }
+  .stars-small { color: var(--gold); font-size: 0.75rem; letter-spacing: 1px; }
+
+  .score-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--rose-deep);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  .stats-bar {
+    background: var(--espresso);
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--rose); display: block; }
+  .stat-label { font-size: 0.75rem; color: #A0897A; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .main-content { padding: 3rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.75rem; }
+
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--espresso); }
+
+  .view-all {
+    font-size: 0.8rem;
+    color: var(--rose-deep);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .filter-row { display: flex; gap: 0.6rem; margin-bottom: 2rem; flex-wrap: wrap; }
+
+  .filter-chip {
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1.5px solid var(--sand);
+    background: white;
+    color: var(--taupe);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .filter-chip.active, .filter-chip:hover {
+    background: var(--espresso);
+    color: white;
+    border-color: var(--espresso);
+  }
+
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+
+  .product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: 1px solid var(--sand);
+  }
+
+  .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(59,42,42,0.1); }
+
+  .card-img {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    position: relative;
+  }
+
+  .card-img-bg1 { background: linear-gradient(135deg, #FFE8EC, #FFD0DA); }
+  .card-img-bg2 { background: linear-gradient(135deg, #E8F0FF, #D0E0FF); }
+  .card-img-bg3 { background: linear-gradient(135deg, #FFF0E8, #FFE0C8); }
+  .card-img-bg4 { background: linear-gradient(135deg, #E8FFEE, #C8F0D8); }
+  .card-img-bg5 { background: linear-gradient(135deg, #F8E8FF, #ECC8FF); }
+  .card-img-bg6 { background: linear-gradient(135deg, #FFFFE8, #FFFAC8); }
+
+  .card-tag {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    color: var(--espresso);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .card-fav {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: none;
+    font-family: inherit;
+  }
+
+  .card-fav:hover { transform: scale(1.15); }
+
+  .card-body { padding: 1.1rem 1.25rem 1.25rem; }
+  .card-brand { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--taupe); margin-bottom: 0.25rem; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--espresso); margin-bottom: 0.6rem; line-height: 1.3; }
+  .card-rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .stars { color: var(--gold); font-size: 0.85rem; }
+  .rating-num { font-weight: 500; font-size: 0.85rem; color: var(--espresso); }
+  .review-count { font-size: 0.75rem; color: var(--taupe); }
+  .card-bottom { display: flex; align-items: center; justify-content: space-between; }
+  .price { font-weight: 500; font-size: 1rem; color: var(--espresso); }
+  .price-old { font-size: 0.75rem; color: var(--taupe); text-decoration: line-through; margin-left: 0.4rem; }
+
+  .btn-review {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--rose-deep);
+    background: #FDF0F3;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-review:hover { background: var(--rose); color: white; }
+
+  .featured-review {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    border: 1px solid var(--sand);
+    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .featured-left { text-align: center; }
+  .featured-emoji { font-size: 5rem; display: block; margin-bottom: 0.75rem; }
+
+  .score-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: conic-gradient(var(--rose-deep) 0% 92%, var(--sand) 92% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .score-inner {
+    width: 56px;
+    height: 56px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .score-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--espresso); line-height: 1; }
+  .score-lbl { font-size: 0.55rem; color: var(--taupe); text-transform: uppercase; letter-spacing: 0.05em; }
+  .featured-title-sm { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--rose-deep); font-weight: 500; margin-bottom: 0.5rem; }
+  .featured-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--espresso); margin-bottom: 0.25rem; }
+  .featured-brand { color: var(--taupe); font-size: 0.85rem; margin-bottom: 1rem; }
+
+  .featured-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--espresso);
+    line-height: 1.6;
+    border-left: 3px solid var(--rose);
+    padding-left: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .criteria-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  .criteria-item { text-align: center; }
+  .criteria-bar { height: 4px; background: var(--sand); border-radius: 999px; margin-bottom: 0.4rem; overflow: hidden; }
+  .criteria-fill { height: 100%; background: var(--rose-deep); border-radius: 999px; }
+  .criteria-label { font-size: 0.65rem; color: var(--taupe); text-transform: uppercase; letter-spacing: 0.05em; }
+  .criteria-score { font-size: 0.8rem; font-weight: 500; color: var(--espresso); }
+
+  .cat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 3rem; }
+
+  .cat-card {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 14px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cat-card:hover { border-color: var(--rose); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,107,128,0.12); }
+
+  .cat-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+  .cat-name { font-size: 0.8rem; font-weight: 500; color: var(--espresso); margin-bottom: 0.2rem; }
+  .cat-count { font-size: 0.7rem; color: var(--taupe); }
+
+  .review-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem; }
+
+  .review-item {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    transition: box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .review-item:hover { box-shadow: 0 4px 20px rgba(59,42,42,0.07); }
+
+  .reviewer-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .av1 { background: #FFE8EC; }
+  .av2 { background: #E8F0FF; }
+  .av3 { background: #E8FFE8; }
+
+  .review-meta { flex: 1; }
+  .reviewer-name { font-weight: 500; font-size: 0.9rem; color: var(--espresso); }
+  .reviewer-info { font-size: 0.75rem; color: var(--taupe); }
+
+  .review-product {
+    font-size: 0.75rem;
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    color: var(--espresso);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.5rem 0;
+  }
+
+  .review-text { font-size: 0.875rem; color: var(--taupe); line-height: 1.5; }
+
+  .newsletter {
+    background: var(--espresso);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .newsletter::before { content: '✦'; position: absolute; top: 1rem; right: 2rem; font-size: 3rem; color: rgba(242,167,180,0.2); }
+  .newsletter::after { content: '✦'; position: absolute; bottom: 1rem; left: 2rem; font-size: 2rem; color: rgba(242,167,180,0.15); }
+
+  .nl-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rose); margin-bottom: 0.5rem; }
+  .nl-desc { color: #A0897A; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+  .nl-form { display: flex; gap: 0.75rem; max-width: 420px; margin: 0 auto; }
+
+  .nl-input {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(242,167,180,0.3);
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    color: white;
+    font-size: 0.875rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+
+  .nl-input::placeholder { color: #7A6A62; }
+  .nl-input:focus { border-color: var(--rose); }
+
+  .nl-btn {
+    background: var(--rose-deep);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .nl-btn:hover { background: var(--rose); }
+
+  footer {
+    background: var(--espresso);
+    color: #8A7567;
+    padding: 2rem 2.5rem;
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--rose); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: #8A7567; text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--rose); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .product-card { animation: fadeUp 0.4s ease both; }
+  .product-card:nth-child(1) { animation-delay: 0.05s; }
+  .product-card:nth-child(2) { animation-delay: 0.1s; }
+  .product-card:nth-child(3) { animation-delay: 0.15s; }
+  .product-card:nth-child(4) { animation-delay: 0.2s; }
+  .product-card:nth-child(5) { animation-delay: 0.25s; }
+  .product-card:nth-child(6) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Glow<span>Up</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Skincare</a></li>
+    <li><a href="#">Makeup</a></li>
+    <li><a href="#">Haircare</a></li>
+    <li><a href="#">Nước hoa</a></li>
+    <li><a href="#">Top Picks</a></li>
+  </ul>
+  <div class="nav-search">🔍 Tìm sản phẩm...</div>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">✦ Review trung thực · Không quảng cáo</div>
+    <h1 class="hero-title">Làm đẹp thông minh,<br><em>chọn đúng sản phẩm</em></h1>
+    <p class="hero-desc">Đánh giá thật từ cộng đồng beauty thực thụ. Chúng tôi test, trải nghiệm và chia sẻ mọi thứ bạn cần biết trước khi mua.</p>
+    <button class="hero-cta">Xem review mới nhất →</button>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <span class="product-emoji">💄</span>
+      <div class="product-brand">Charlotte Tilbury</div>
+      <div class="product-name">Pillow Talk Lipstick</div>
+      <div class="stars-small">★★★★★</div>
+      <div class="score-badge">9.4</div>
+    </div>
+    <div class="hero-card">
+      <span class="product-emoji">🌿</span>
+      <div class="product-brand">La Mer</div>
+      <div class="product-name">Crème de la Mer</div>
+      <div class="stars-small">★★★★☆</div>
+      <div class="score-badge">8.8</div>
+    </div>
+    <div class="hero-card">
+      <span class="product-emoji">🧴</span>
+      <div class="product-brand">Sulwhasoo</div>
+      <div class="product-name">First Care Activating Serum</div>
+      <div class="stars-small">★★★★★</div>
+      <div class="score-badge">9.1</div>
+    </div>
+    <div class="hero-card">
+      <span class="product-emoji">✨</span>
+      <div class="product-brand">NARS</div>
+      <div class="product-name">Radiant Creamy Concealer</div>
+      <div class="stars-small">★★★★☆</div>
+      <div class="score-badge">8.6</div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">12.4K</span>
+    <span class="stat-label">Sản phẩm đã review</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">89K</span>
+    <span class="stat-label">Thành viên</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">340K+</span>
+    <span class="stat-label">Lượt đánh giá</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">4.8★</span>
+    <span class="stat-label">Độ tin cậy</span>
+  </div>
+</div>
+
+<main class="main-content">
+
+  <div class="section-header">
+    <h2 class="section-title">Danh mục</h2>
+    <a class="view-all" href="#">Tất cả →</a>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card"><span class="cat-icon">💆</span><div class="cat-name">Dưỡng da</div><div class="cat-count">3.2K sản phẩm</div></div>
+    <div class="cat-card"><span class="cat-icon">💄</span><div class="cat-name">Trang điểm</div><div class="cat-count">4.1K sản phẩm</div></div>
+    <div class="cat-card"><span class="cat-icon">💇</span><div class="cat-name">Tóc & body</div><div class="cat-count">1.8K sản phẩm</div></div>
+    <div class="cat-card"><span class="cat-icon">🌸</span><div class="cat-name">Nước hoa</div><div class="cat-count">980 sản phẩm</div></div>
+    <div class="cat-card"><span class="cat-icon">☀️</span><div class="cat-name">Chống nắng</div><div class="cat-count">620 sản phẩm</div></div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Review nổi bật tuần này</h2>
+  </div>
+  <div class="featured-review">
+    <div class="featured-left">
+      <span class="featured-emoji">🌟</span>
+      <div class="score-ring">
+        <div class="score-inner">
+          <span class="score-val">9.4</span>
+          <span class="score-lbl">/ 10</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="featured-title-sm">✦ Editor's Choice</div>
+      <div class="featured-name">Some By Mi AHA BHA PHA 30 Days Miracle Toner</div>
+      <div class="featured-brand">Some By Mi · Toner dưỡng da</div>
+      <div class="featured-quote">"Đây là toner đầu tiên tôi dùng mà thấy khác biệt rõ rệt chỉ sau 2 tuần. Da sáng hơn, mụn giảm đáng kể — hoàn toàn xứng đáng với cái giá."</div>
+      <div class="criteria-grid">
+        <div class="criteria-item"><div class="criteria-score">9.5</div><div class="criteria-bar"><div class="criteria-fill" style="width:95%"></div></div><div class="criteria-label">Hiệu quả</div></div>
+        <div class="criteria-item"><div class="criteria-score">9.0</div><div class="criteria-bar"><div class="criteria-fill" style="width:90%"></div></div><div class="criteria-label">Kết cấu</div></div>
+        <div class="criteria-item"><div class="criteria-score">9.8</div><div class="criteria-bar"><div class="criteria-fill" style="width:98%"></div></div><div class="criteria-label">Giá trị</div></div>
+        <div class="criteria-item"><div class="criteria-score">8.8</div><div class="criteria-bar"><div class="criteria-fill" style="width:88%"></div></div><div class="criteria-label">Mùi hương</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Sản phẩm được xem nhiều nhất</h2>
+    <a class="view-all" href="#">Xem tất cả →</a>
+  </div>
+  <div class="filter-row">
+    <button class="filter-chip active">Tất cả</button>
+    <button class="filter-chip">Skincare</button>
+    <button class="filter-chip">Makeup</button>
+    <button class="filter-chip">Serum</button>
+    <button class="filter-chip">Kem nền</button>
+    <button class="filter-chip">Toner</button>
+    <button class="filter-chip">Dưỡng ẩm</button>
+  </div>
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="card-img card-img-bg1">💄<div class="card-tag">Trending</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">Charlotte Tilbury</div>
+        <div class="card-title">Pillow Talk Lipstick</div>
+        <div class="card-rating"><span class="stars">★★★★★</span><span class="rating-num">4.9</span><span class="review-count">(2.1K)</span></div>
+        <div class="card-bottom"><div><span class="price">850K</span><span class="price-old">1.1tr</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="card-img card-img-bg2">🧴<div class="card-tag">Editor's Pick</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">Laneige</div>
+        <div class="card-title">Water Sleeping Mask</div>
+        <div class="card-rating"><span class="stars">★★★★☆</span><span class="rating-num">4.7</span><span class="review-count">(1.4K)</span></div>
+        <div class="card-bottom"><div><span class="price">490K</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="card-img card-img-bg3">✨<div class="card-tag">Best Value</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">The Ordinary</div>
+        <div class="card-title">Niacinamide 10% + Zinc 1%</div>
+        <div class="card-rating"><span class="stars">★★★★★</span><span class="rating-num">4.8</span><span class="review-count">(5.3K)</span></div>
+        <div class="card-bottom"><div><span class="price">220K</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="card-img card-img-bg4">🌿<div class="card-tag">Organic</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">Innisfree</div>
+        <div class="card-title">Green Tea Seed Serum</div>
+        <div class="card-rating"><span class="stars">★★★★☆</span><span class="rating-num">4.5</span><span class="review-count">(890)</span></div>
+        <div class="card-bottom"><div><span class="price">560K</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="card-img card-img-bg5">💜<div class="card-tag">Luxury</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">SK-II</div>
+        <div class="card-title">Facial Treatment Essence</div>
+        <div class="card-rating"><span class="stars">★★★★★</span><span class="rating-num">4.9</span><span class="review-count">(3.7K)</span></div>
+        <div class="card-bottom"><div><span class="price">2.8tr</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="card-img card-img-bg6">☀️<div class="card-tag">SPF50+</div><button class="card-fav">🤍</button></div>
+      <div class="card-body">
+        <div class="card-brand">Anessa</div>
+        <div class="card-title">Perfect UV Sunscreen Milk</div>
+        <div class="card-rating"><span class="stars">★★★★★</span><span class="rating-num">4.8</span><span class="review-count">(4.2K)</span></div>
+        <div class="card-bottom"><div><span class="price">650K</span></div><button class="btn-review">Đọc review</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Review mới nhất từ cộng đồng</h2>
+    <a class="view-all" href="#">Xem tất cả →</a>
+  </div>
+  <div class="review-list">
+    <div class="review-item">
+      <div class="reviewer-avatar av1">🌸</div>
+      <div class="review-meta">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.3rem">
+          <span class="reviewer-name">Minh Thư</span>
+          <span class="stars" style="font-size:0.75rem">★★★★★</span>
+          <span class="reviewer-info">· 2 giờ trước</span>
+        </div>
+        <div class="review-product">💄 Charlotte Tilbury · Pillow Talk</div>
+        <div class="review-text">Son màu đẹp tự nhiên, giữ màu tốt cả ngày dù ăn uống. Kết cấu mịn, không khô môi. Đây là son tôi recommend cho mọi người!</div>
+      </div>
+    </div>
+    <div class="review-item">
+      <div class="reviewer-avatar av2">🦋</div>
+      <div class="review-meta">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.3rem">
+          <span class="reviewer-name">Khánh Linh</span>
+          <span class="stars" style="font-size:0.75rem">★★★★☆</span>
+          <span class="reviewer-info">· 5 giờ trước</span>
+        </div>
+        <div class="review-product">🧴 The Ordinary · Niacinamide 10%</div>
+        <div class="review-text">Dùng được 3 tuần, mụn đầu đen giảm rõ rệt. Giá rẻ mà hiệu quả không thua kém hàng high-end. Mùi hơi nặng nhưng chấp nhận được.</div>
+      </div>
+    </div>
+    <div class="review-item">
+      <div class="reviewer-avatar av3">🌺</div>
+      <div class="review-meta">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.3rem">
+          <span class="reviewer-name">Bảo Ngọc</span>
+          <span class="stars" style="font-size:0.75rem">★★★★★</span>
+          <span class="reviewer-info">· 1 ngày trước</span>
+        </div>
+        <div class="review-product">☀️ Anessa · Perfect UV Sunscreen</div>
+        <div class="review-text">Kem chống nắng số 1 của tôi. Thoa vào không nhờn rít, makeup lên đẹp, chống nắng cực tốt. Đã dùng 5 năm vẫn không đổi sang loại khác!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="newsletter">
+    <div class="nl-title">Nhận beauty tips mỗi tuần</div>
+    <div class="nl-desc">Review mới, sản phẩm hot, deal ngon — gửi thẳng vào inbox của bạn</div>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="Email của bạn...">
+      <button class="nl-btn">Đăng ký ✦</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-logo">GlowUp</div>
+  <div style="font-size:0.75rem">© 2025 GlowUp. Review trung thực, không quảng cáo trả phí.</div>
+  <div class="footer-links">
+    <a href="#">Về chúng tôi</a>
+    <a href="#">Chính sách</a>
+    <a href="#">Liên hệ</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.card-fav').forEach(fav => {
+    fav.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fav.textContent = fav.textContent === '🤍' ? '🩷' : '🤍';
+    });
+  });
+</script>
+
+</body>
+</html>
