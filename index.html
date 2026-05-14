@@ -752,6 +752,9 @@
 </footer>
 
 <script>
+  const SUPABASE_URL = 'https://mojgtzjmscmztswhzwzv.supabase.co';  // URL thật của bạn
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0';  // anon key thật của bạn
+
   document.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
