@@ -54,6 +54,9 @@ tr:hover td{background:var(--cream)}
 .abtn.view:hover{background:#1565C0;color:white}
 .abtn.edit{background:#FFF3E0;color:#E65100}
 .abtn.edit:hover{background:#E65100;color:white}
+.action-select{padding:.35rem .6rem;border:1.5px solid var(--sand);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--espresso);background:white;cursor:pointer;outline:none;transition:border-color .2s}
+.action-select:hover{border-color:var(--rose-deep)}
+.action-select:focus{border-color:var(--rose-deep)}
 .user-role{display:inline-flex;align-items:center;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
 .user-role.admin{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
 .user-role.user{background:#E8F0FF;color:#1565C0;border:1px solid #BBDEFB}
@@ -320,15 +323,29 @@ function reviewTable(rows) {
       <td><strong>${r.rating||0}</strong>/10</td>
       <td><span class="status ${r.status}">${r.status==='pending'?'⏳ Chờ duyệt':r.status==='approved'?'✅ Đã duyệt':'❌ Từ chối'}</span></td>
       <td style="font-size:.75rem;color:var(--taupe)">${new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
-      <td><div class="action-btns">
-        <button class="abtn view" onclick="openModal('${r.id}')">👁 Xem</button>
-        <button class="abtn edit" onclick="openModal('${r.id}','edit')">✏️ Sửa</button>
-        ${r.status!=='approved'?`<button class="abtn approve" onclick="updateReview('${r.id}','approved')">✅</button>`:''}
-        ${r.status!=='rejected'?`<button class="abtn reject" onclick="updateReview('${r.id}','rejected')">❌</button>`:''}
-        <button class="abtn del" onclick="deleteReview('${r.id}')">🗑️</button>
-      </div></td>
+      <td>
+        <select class="action-select" onchange="handleAction(this,'${r.id}')">
+          <option value="">-- Hành động --</option>
+          <option value="view">👁 Xem chi tiết</option>
+          <option value="edit">✏️ Chỉnh sửa</option>
+          ${r.status!=='approved'?`<option value="approved">✅ Duyệt bài</option>`:''}
+          ${r.status!=='rejected'?`<option value="rejected">❌ Từ chối</option>`:''}
+          <option value="delete">🗑️ Xoá bài</option>
+        </select>
+      </td>
     </tr>`).join('')}</tbody>
   </table></div>`;
+}
+
+async function handleAction(sel, id) {
+  const val = sel.value;
+  sel.value = '';
+  if (!val) return;
+  if (val==='view')     openModal(id, 'view');
+  else if (val==='edit')     openModal(id, 'edit');
+  else if (val==='approved') updateReview(id, 'approved');
+  else if (val==='rejected') updateReview(id, 'rejected');
+  else if (val==='delete')   deleteReview(id);
 }
 
 async function openModal(id, tab='view') {
