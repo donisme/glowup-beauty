@@ -218,6 +218,7 @@ tr:hover td{background:var(--cream)}
     <div class="sidebar-item" onclick="showPage('reviews',this)"><span>📝</span> Kiểm duyệt review</div>
     <div class="sidebar-item" onclick="showPage('users',this)"><span>👥</span> Quản lý user</div>
     <div class="sidebar-item" onclick="showPage('comments',this)"><span>💬</span> Bình luận</div>
+    <div class="sidebar-item" onclick="showPage('tags',this)"><span>🏷️</span> Quản lý tags</div>
   </div>
   <div class="content">
     <div id="flash" class="msg-flash"></div>
@@ -253,6 +254,20 @@ tr:hover td{background:var(--cream)}
       <div class="section-title">Bình luận gần đây</div>
       <div id="comments-table"></div>
     </div>
+
+    <div id="page-tags" class="page">
+      <div class="section-title">Quản lý Tags</div>
+      <div style="display:flex;gap:.75rem;margin-bottom:1.5rem">
+        <input type="text" id="new-tag-input" placeholder="Nhập tên tag mới..." style="flex:1;padding:.65rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--espresso);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--rose-deep)'" onblur="this.style.borderColor='var(--sand)'" onkeydown="if(event.key==='Enter')addAdminTag()">
+        <button onclick="addAdminTag()" style="padding:.65rem 1.5rem;background:var(--espresso);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--rose-deep)'" onmouseout="this.style.background='var(--espresso)'">+ Thêm tag</button>
+      </div>
+      <div class="tabs-bar">
+        <span class="tab active" onclick="loadAdminTags('all',this)">Tất cả</span>
+        <span class="tab" onclick="loadAdminTags('default',this)">⭐ Mặc định</span>
+        <span class="tab" onclick="loadAdminTags('custom',this)">🏷️ Người dùng thêm</span>
+      </div>
+      <div id="tags-table"></div>
+    </div>
   </div>
 </div>
 
@@ -284,6 +299,7 @@ function showPage(name, el) {
   if (name==='reviews')  loadReviews('pending');
   if (name==='users')    loadUsers();
   if (name==='comments') loadComments();
+  if (name==='tags')     loadAdminTags('all');
 }
 
 function flash(msg, type) {
@@ -535,6 +551,53 @@ async function deleteComment(id) {
   const { error } = await db.from('comments').delete().eq('id', id);
   if (error) flash('Lỗi: '+error.message,'err');
   else { flash('🗑️ Đã xoá!','ok'); loadComments(); }
+}
+
+async function loadAdminTags(filter, tabEl) {
+  if (tabEl) { document.querySelectorAll('#page-tags .tab').forEach(t=>t.classList.remove('active')); tabEl.classList.add('active'); }
+  let q = db.from('tags').select('*, profiles(username)').order('is_default',{ascending:false}).order('name');
+  if (filter==='default') q = q.eq('is_default', true);
+  if (filter==='custom')  q = q.eq('is_default', false);
+  const { data } = await q;
+  const wrap = document.getElementById('tags-table');
+  if (!data?.length) { wrap.innerHTML='<div class="empty">Không có tag nào.</div>'; return; }
+  wrap.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Tên tag</th><th>Loại</th><th>Người tạo</th><th>Ngày tạo</th><th>Hành động</th></tr></thead>
+    <tbody>${data.map(t=>`<tr>
+      <td><strong>${t.name}</strong></td>
+      <td>${t.is_default
+        ? '<span class="status approved">⭐ Mặc định</span>'
+        : '<span class="status pending">🏷️ Người dùng</span>'}</td>
+      <td style="font-size:.8rem;color:var(--taupe)">${t.profiles?.username||'—'}</td>
+      <td style="font-size:.75rem;color:var(--taupe)">${new Date(t.created_at).toLocaleDateString('vi-VN')}</td>
+      <td><div class="action-btns">
+        ${!t.is_default?`<button class="abtn approve" onclick="setTagDefault('${t.id}',true)">⭐ Đặt mặc định</button>`:`<button class="abtn reject" onclick="setTagDefault('${t.id}',false)">↩️ Bỏ mặc định</button>`}
+        <button class="abtn del" onclick="deleteTag('${t.id}')">🗑️ Xoá</button>
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function addAdminTag() {
+  const input = document.getElementById('new-tag-input');
+  const name  = input.value.trim().toLowerCase();
+  if (!name) return;
+  const { error } = await db.from('tags').insert({ name, is_default: true });
+  if (error) flash('Tag đã tồn tại hoặc lỗi: ' + error.message, 'err');
+  else { flash('✅ Đã thêm tag "' + name + '"!', 'ok'); input.value=''; loadAdminTags('all'); }
+}
+
+async function setTagDefault(id, val) {
+  const { error } = await db.from('tags').update({ is_default: val }).eq('id', id);
+  if (error) flash('Lỗi: '+error.message,'err');
+  else { flash('✅ Đã cập nhật!','ok'); loadAdminTags('all'); }
+}
+
+async function deleteTag(id) {
+  if (!confirm('Xoá tag này? Tag sẽ không còn hiển thị khi viết review.')) return;
+  const { error } = await db.from('tags').delete().eq('id', id);
+  if (error) flash('Lỗi: '+error.message,'err');
+  else { flash('🗑️ Đã xoá tag!','ok'); loadAdminTags('all'); }
 }
 
 async function logout() { await db.auth.signOut(); location.href='auth.html'; }
