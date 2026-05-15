@@ -39,6 +39,14 @@ input::placeholder,textarea::placeholder{color:#C4B5AA}
 .ac-new{padding:.65rem 1rem;font-size:.875rem;color:var(--taupe);cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:background .15s}
 .ac-new:hover{background:var(--cream)}
 .ac-new span{color:var(--rose-deep);font-weight:500}
+.custom-tag-wrap{display:flex;gap:.5rem;margin-top:.75rem}
+.custom-tag-wrap input{flex:1;padding:.5rem .9rem;border:1.5px solid var(--sand);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--espresso);outline:none;transition:border-color .2s}
+.custom-tag-wrap input:focus{border-color:var(--rose-deep)}
+.custom-tag-wrap input::placeholder{color:#C4B5AA}
+.custom-tag-wrap button{padding:.5rem 1rem;background:var(--espresso);color:white;border:none;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .2s}
+.custom-tag-wrap button:hover{background:var(--rose-deep)}
+.tag-chip.custom{border-color:var(--rose-deep);color:var(--rose-deep)}
+.tag-chip.custom.sel{background:var(--rose-deep);color:white;border-color:var(--rose-deep)}
 textarea{resize:vertical;min-height:140px;line-height:1.6}
 .tags-wrap{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
 .tag-chip{padding:.3rem .85rem;border-radius:999px;font-size:.78rem;font-weight:500;border:1.5px solid var(--sand);background:white;color:var(--taupe);cursor:pointer;transition:all .15s}
@@ -141,16 +149,12 @@ input[type=range]{flex:1;padding:0;border:none;background:transparent;accent-col
       </div>
       <div class="fg">
         <label>Tags</label>
-        <div class="tags-wrap">
-          <span class="tag-chip" onclick="tog(this,'dưỡng ẩm')">💧 Dưỡng ẩm</span>
-          <span class="tag-chip" onclick="tog(this,'chống lão hóa')">✨ Chống lão hóa</span>
-          <span class="tag-chip" onclick="tog(this,'trị mụn')">🌿 Trị mụn</span>
-          <span class="tag-chip" onclick="tog(this,'làm sáng da')">☀️ Làm sáng da</span>
-          <span class="tag-chip" onclick="tog(this,'lâu trôi')">💄 Lâu trôi</span>
-          <span class="tag-chip" onclick="tog(this,'da dầu')">💦 Da dầu</span>
-          <span class="tag-chip" onclick="tog(this,'da khô')">🌸 Da khô</span>
-          <span class="tag-chip" onclick="tog(this,'da nhạy cảm')">🤍 Da nhạy cảm</span>
-          <span class="tag-chip" onclick="tog(this,'giá tốt')">💰 Giá tốt</span>
+        <div class="tags-wrap" id="tags-wrap">
+          <div style="font-size:.8rem;color:var(--taupe)">⏳ Đang tải tags...</div>
+        </div>
+        <div class="custom-tag-wrap">
+          <input type="text" id="custom-tag" placeholder="Thêm tag mới..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag()}">
+          <button type="button" onclick="addCustomTag()">+ Thêm</button>
         </div>
       </div>
     </div>
@@ -306,12 +310,60 @@ window.addEventListener('load', async () => {
   const { data: p } = await db.from('profiles').select('username').eq('id', user.id).single();
   if (p) document.getElementById('nav-user').textContent = '👤 ' + p.username;
   await loadExisting();
+  await loadTags();
 });
+
+let allTags = [];
+
+async function loadTags() {
+  const { data } = await db.from('tags').select('*').order('is_default', {ascending:false}).order('name');
+  allTags = data || [];
+  renderTags();
+}
+
+function renderTags() {
+  const wrap = document.getElementById('tags-wrap');
+  if (!allTags.length) { wrap.innerHTML = '<div style="font-size:.8rem;color:var(--taupe)">Chưa có tag nào.</div>'; return; }
+  wrap.innerHTML = allTags.map(t => `
+    <span class="tag-chip ${t.is_default?'':'custom'} ${selectedTags.includes(t.name)?'sel':''}"
+      onclick="tog(this,'${t.name.replace(/'/g,"\\'")}')">
+      ${t.is_default ? '' : '🏷️ '}${t.name}
+    </span>`).join('');
+}
 
 function tog(el, tag) {
   el.classList.toggle('sel');
   if (el.classList.contains('sel')) selectedTags.push(tag);
   else selectedTags = selectedTags.filter(t => t !== tag);
+}
+
+async function addCustomTag() {
+  const input = document.getElementById('custom-tag');
+  const name  = input.value.trim().toLowerCase();
+  if (!name) return;
+
+  // Kiểm tra đã tồn tại chưa
+  if (allTags.find(t => t.name === name)) {
+    // Chọn tag đó luôn
+    if (!selectedTags.includes(name)) selectedTags.push(name);
+    renderTags();
+    input.value = '';
+    return;
+  }
+
+  // Lưu tag mới vào database
+  const { data, error } = await db.from('tags').insert({
+    name,
+    created_by: currentUser.id,
+    is_default: false
+  }).select().single();
+
+  if (!error && data) {
+    allTags.push(data);
+    selectedTags.push(name);
+    renderTags();
+  }
+  input.value = '';
 }
 
 function preview(input) {
