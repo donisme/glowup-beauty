@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp — Viết Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--rose:#F2A7B4;--rose-deep:#C96B80;--cream:#FDF6EE;--sand:#E8DDD0;--espresso:#3B2A2A;--taupe:#8A7567;--gold:#C9A96B}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--espresso)}
+nav{background:white;border-bottom:1px solid var(--sand);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--espresso);text-decoration:none}
+.logo span{color:var(--rose-deep);font-style:italic}
+.nav-r{display:flex;align-items:center;gap:1rem;font-size:.85rem}
+.nav-r a{color:var(--taupe);text-decoration:none}
+.container{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem}
+.page-title{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:.4rem}
+.page-title em{color:var(--rose-deep);font-style:italic}
+.page-sub{color:var(--taupe);font-size:.9rem;margin-bottom:2rem}
+.card{background:white;border-radius:20px;padding:2rem;border:1px solid var(--sand);box-shadow:0 4px 24px rgba(59,42,42,.05);margin-bottom:1.25rem}
+.card-title{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--sand)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fg{margin-bottom:1.1rem}
+label{display:block;font-size:.78rem;font-weight:500;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+label span{color:var(--rose-deep)}
+input[type=text],input[type=number],select,textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--espresso);background:white;outline:none;transition:border-color .2s;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--rose-deep)}
+input::placeholder,textarea::placeholder{color:#C4B5AA}
+textarea{resize:vertical;min-height:140px;line-height:1.6}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.tag-chip{padding:.3rem .85rem;border-radius:999px;font-size:.78rem;font-weight:500;border:1.5px solid var(--sand);background:white;color:var(--taupe);cursor:pointer;transition:all .15s}
+.tag-chip.sel{background:var(--espresso);color:white;border-color:var(--espresso)}
+.score-wrap{position:relative}
+.score-wrap input{padding-right:3rem}
+.score-sfx{position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--taupe);font-size:.85rem;pointer-events:none}
+.range-wrap{display:flex;align-items:center;gap:.75rem}
+input[type=range]{flex:1;padding:0;border:none;background:transparent;accent-color:var(--rose-deep);height:4px}
+.range-val{font-weight:500;font-size:.9rem;min-width:28px;text-align:right;color:var(--rose-deep)}
+.upload-area{border:2px dashed var(--sand);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-area:hover{border-color:var(--rose-deep);background:#FDF0F3}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:2rem;margin-bottom:.5rem}
+.upload-text{font-size:.85rem;color:var(--taupe)}
+.upload-text strong{color:var(--rose-deep)}
+.preview-img{width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-top:.75rem;display:none}
+.criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.msg{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;display:none}
+.msg.ok{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;display:block}
+.msg.err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;display:block}
+.submit-wrap{display:flex;gap:1rem}
+.btn-submit{flex:1;padding:.9rem;background:var(--espresso);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
+.btn-submit:hover{background:var(--rose-deep);transform:translateY(-1px)}
+.btn-submit:disabled{background:var(--sand);color:var(--taupe);cursor:not-allowed;transform:none}
+.btn-cancel{padding:.9rem 1.5rem;background:white;color:var(--taupe);border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;display:flex;align-items:center}
+.btn-cancel:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
+.not-logged{text-align:center;padding:4rem 2rem}
+.not-logged .icon{font-size:3rem;margin-bottom:1rem}
+.not-logged h2{font-family:'Playfair Display',serif;margin-bottom:.5rem}
+.not-logged p{color:var(--taupe);font-size:.9rem;margin-bottom:1.5rem}
+.login-btn{display:inline-block;padding:.75rem 2rem;background:var(--espresso);color:white;border-radius:999px;text-decoration:none;font-weight:500;font-size:.9rem;transition:background .2s}
+.login-btn:hover{background:var(--rose-deep)}
+.success-state{display:none;text-align:center;padding:3rem 2rem}
+.success-icon{font-size:4rem;margin-bottom:1rem}
+.success-title{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:.5rem}
+.success-sub{color:var(--taupe);font-size:.9rem;margin-bottom:2rem;line-height:1.6}
+.sactions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.sactions a{padding:.7rem 1.5rem;border-radius:999px;font-size:.875rem;font-weight:500;text-decoration:none;transition:all .2s}
+.sa-p{background:var(--espresso);color:white}
+.sa-p:hover{background:var(--rose-deep)}
+.sa-s{background:white;color:var(--espresso);border:1.5px solid var(--sand)}
+.sa-s:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
+@media(max-width:600px){.form-row,.criteria-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Glow<span>Up</span></a>
+  <div class="nav-r">
+    <span id="nav-user"></span>
+    <a href="index.html">Trang chủ</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="not-logged" class="not-logged card" style="display:none">
+    <div class="icon">🔒</div>
+    <h2>Bạn chưa đăng nhập</h2>
+    <p>Vui lòng đăng nhập để viết review.</p>
+    <a href="auth.html" class="login-btn">Đăng nhập ngay</a>
+  </div>
+
+  <div id="review-form" style="display:none">
+    <h1 class="page-title">Viết <em>review</em> mới</h1>
+    <p class="page-sub">Chia sẻ trải nghiệm thật của bạn với cộng đồng GlowUp ✦</p>
+    <div id="msg" class="msg"></div>
+
+    <div class="card">
+      <div class="card-title">📦 Thông tin sản phẩm</div>
+      <div class="form-row">
+        <div class="fg"><label>Tên sản phẩm <span>*</span></label><input type="text" id="pname" placeholder="VD: Pillow Talk Lipstick"></div>
+        <div class="fg"><label>Thương hiệu <span>*</span></label><input type="text" id="brand" placeholder="VD: Charlotte Tilbury"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Danh mục <span>*</span></label>
+          <select id="cat">
+            <option value="">Chọn danh mục...</option>
+            <option value="skincare">Dưỡng da</option>
+            <option value="makeup">Trang điểm</option>
+            <option value="haircare">Tóc & Body</option>
+            <option value="perfume">Nước hoa</option>
+            <option value="sunscreen">Chống nắng</option>
+            <option value="other">Khác</option>
+          </select>
+        </div>
+        <div class="fg"><label>Giá tham khảo</label><input type="text" id="price" placeholder="VD: 850.000đ"></div>
+      </div>
+      <div class="fg">
+        <label>Tags</label>
+        <div class="tags-wrap">
+          <span class="tag-chip" onclick="tog(this,'dưỡng ẩm')">💧 Dưỡng ẩm</span>
+          <span class="tag-chip" onclick="tog(this,'chống lão hóa')">✨ Chống lão hóa</span>
+          <span class="tag-chip" onclick="tog(this,'trị mụn')">🌿 Trị mụn</span>
+          <span class="tag-chip" onclick="tog(this,'làm sáng da')">☀️ Làm sáng da</span>
+          <span class="tag-chip" onclick="tog(this,'lâu trôi')">💄 Lâu trôi</span>
+          <span class="tag-chip" onclick="tog(this,'da dầu')">💦 Da dầu</span>
+          <span class="tag-chip" onclick="tog(this,'da khô')">🌸 Da khô</span>
+          <span class="tag-chip" onclick="tog(this,'da nhạy cảm')">🤍 Da nhạy cảm</span>
+          <span class="tag-chip" onclick="tog(this,'giá tốt')">💰 Giá tốt</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✍️ Nội dung review</div>
+      <div class="fg"><label>Tiêu đề <span>*</span></label><input type="text" id="title" placeholder="VD: Son đẹp nhất tôi từng dùng!"></div>
+      <div class="fg"><label>Nội dung chi tiết <span>*</span></label><textarea id="content" placeholder="Chia sẻ trải nghiệm: kết cấu, mùi hương, hiệu quả..."></textarea></div>
+      <div class="form-row">
+        <div class="fg"><label>Ưu điểm</label><input type="text" id="pros" placeholder="Màu đẹp, giữ màu tốt..."></div>
+        <div class="fg"><label>Nhược điểm</label><input type="text" id="cons" placeholder="Giá hơi cao..."></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⭐ Đánh giá</div>
+      <div class="fg">
+        <label>Điểm tổng thể <span>*</span> (1–10)</label>
+        <div class="score-wrap"><input type="number" id="rating" min="1" max="10" step="0.1" placeholder="8.5"><span class="score-sfx">/ 10</span></div>
+      </div>
+      <div class="criteria-grid">
+        <div class="fg"><label>Hiệu quả</label><div class="range-wrap"><input type="range" min="1" max="10" value="8" id="r-eff" oninput="document.getElementById('v-eff').textContent=this.value"><span class="range-val" id="v-eff">8</span></div></div>
+        <div class="fg"><label>Kết cấu / Mùi hương</label><div class="range-wrap"><input type="range" min="1" max="10" value="8" id="r-tex" oninput="document.getElementById('v-tex').textContent=this.value"><span class="range-val" id="v-tex">8</span></div></div>
+        <div class="fg"><label>Giá trị</label><div class="range-wrap"><input type="range" min="1" max="10" value="8" id="r-val" oninput="document.getElementById('v-val').textContent=this.value"><span class="range-val" id="v-val">8</span></div></div>
+        <div class="fg"><label>Bao bì / Thiết kế</label><div class="range-wrap"><input type="range" min="1" max="10" value="8" id="r-des" oninput="document.getElementById('v-des').textContent=this.value"><span class="range-val" id="v-des">8</span></div></div>
+      </div>
+      <div class="fg">
+        <label>Recommend?</label>
+        <select id="rec">
+          <option value="yes">👍 Có, tôi recommend!</option>
+          <option value="maybe">🤔 Tuỳ người dùng</option>
+          <option value="no">👎 Không recommend</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📸 Ảnh sản phẩm</div>
+      <div class="upload-area">
+        <input type="file" id="img-file" accept="image/*" onchange="preview(this)">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text"><strong>Nhấn để chọn ảnh</strong> hoặc kéo thả<br><span style="font-size:.75rem;color:#C4B5AA">JPG, PNG, WEBP — tối đa 5MB</span></div>
+        <img class="preview-img" id="prev-img" src="" alt="">
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <a href="index.html" class="btn-cancel">Huỷ</a>
+      <button class="btn-submit" id="sbtn" onclick="submit()">Gửi review để duyệt ✦</button>
+    </div>
+  </div>
+
+  <div id="success-state" class="success-state card">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Review đã được gửi!</div>
+    <div class="success-sub">Cảm ơn bạn! Review đang chờ admin kiểm duyệt.<br>Sau khi duyệt sẽ hiển thị trên trang chủ.</div>
+    <div class="sactions">
+      <a href="index.html" class="sa-p">🏠 Về trang chủ</a>
+      <a href="post-review.html" class="sa-s">✍️ Viết tiếp</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const db = window.supabase.createClient(
+  'https://mojgtzjmscmztswhzwzv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0'
+);
+
+let currentUser = null;
+let selectedTags = [];
+
+window.addEventListener('load', async () => {
+  const { data:{ user } } = await db.auth.getUser();
+  if (!user) { document.getElementById('not-logged').style.display = 'block'; return; }
+  currentUser = user;
+  document.getElementById('review-form').style.display = 'block';
+  const { data: p } = await db.from('profiles').select('username').eq('id', user.id).single();
+  if (p) document.getElementById('nav-user').textContent = '👤 ' + p.username;
+});
+
+function tog(el, tag) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) selectedTags.push(tag);
+  else selectedTags = selectedTags.filter(t => t !== tag);
+}
+
+function preview(input) {
+  const file = input.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = e => { const img = document.getElementById('prev-img'); img.src = e.target.result; img.style.display = 'block'; };
+  r.readAsDataURL(file);
+}
+
+function setMsg(txt, type) {
+  const el = document.getElementById('msg'); el.textContent = txt; el.className = 'msg ' + type;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function submit() {
+  const pname   = document.getElementById('pname').value.trim();
+  const brand   = document.getElementById('brand').value.trim();
+  const cat     = document.getElementById('cat').value;
+  const title   = document.getElementById('title').value.trim();
+  const content = document.getElementById('content').value.trim();
+  const rating  = parseFloat(document.getElementById('rating').value);
+  if (!pname)   return setMsg('Vui lòng nhập tên sản phẩm.','err');
+  if (!brand)   return setMsg('Vui lòng nhập thương hiệu.','err');
+  if (!cat)     return setMsg('Vui lòng chọn danh mục.','err');
+  if (!title)   return setMsg('Vui lòng nhập tiêu đề.','err');
+  if (!content) return setMsg('Vui lòng nhập nội dung.','err');
+  if (!rating || rating<1 || rating>10) return setMsg('Điểm tổng thể phải từ 1 đến 10.','err');
+
+  const btn = document.getElementById('sbtn');
+  btn.disabled = true; btn.textContent = 'Đang gửi...';
+
+  let imageUrl = null;
+  const fileInput = document.getElementById('img-file');
+  if (fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const fname = `${currentUser.id}-${Date.now()}.${file.name.split('.').pop()}`;
+    const { error: ue } = await db.storage.from('review-images').upload(fname, file);
+    if (!ue) {
+      const { data: ud } = db.storage.from('review-images').getPublicUrl(fname);
+      imageUrl = ud.publicUrl;
+    }
+  }
+
+  const { error } = await db.from('reviews').insert({
+    user_id: currentUser.id,
+    product_name: pname, brand, category: cat,
+    price: document.getElementById('price').value.trim(),
+    title, content,
+    pros: document.getElementById('pros').value.trim(),
+    cons: document.getElementById('cons').value.trim(),
+    rating,
+    score_effect:  parseInt(document.getElementById('r-eff').value),
+    score_texture: parseInt(document.getElementById('r-tex').value),
+    score_value:   parseInt(document.getElementById('r-val').value),
+    score_design:  parseInt(document.getElementById('r-des').value),
+    recommend: document.getElementById('rec').value,
+    tags: selectedTags, image_url: imageUrl, status: 'pending'
+  });
+
+  if (error) {
+    setMsg('Lỗi: ' + error.message, 'err');
+    btn.disabled = false; btn.textContent = 'Gửi review để duyệt ✦';
+  } else {
+    document.getElementById('review-form').style.display = 'none';
+    document.getElementById('success-state').style.display = 'block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+</script>
+</body>
+</html>

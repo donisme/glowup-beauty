@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--rose:#F2A7B4;--rose-deep:#C96B80;--cream:#FDF6EE;--sand:#E8DDD0;--espresso:#3B2A2A;--taupe:#8A7567;--gold:#C9A96B}
+body{font-family:'DM Sans',sans-serif;background:#F5F0EA;color:var(--espresso)}
+nav{background:var(--espresso);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:white;text-decoration:none}
+.logo span{color:var(--rose);font-style:italic}
+.nav-r{display:flex;align-items:center;gap:1rem;font-size:.85rem}
+.nav-r a{color:#A0897A;text-decoration:none;transition:color .2s}
+.nav-r a:hover{color:var(--rose)}
+.admin-badge{background:var(--rose-deep);color:white;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
+.layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:220px;background:white;border-right:1px solid var(--sand);padding:1.5rem 0;flex-shrink:0}
+.sidebar-item{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.5rem;font-size:.875rem;color:var(--taupe);cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.sidebar-item:hover{background:var(--cream);color:var(--espresso)}
+.sidebar-item.active{background:var(--cream);color:var(--rose-deep);border-left-color:var(--rose-deep);font-weight:500}
+.sidebar-icon{font-size:1rem;width:20px;text-align:center}
+.content{flex:1;padding:2rem;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:white;border-radius:14px;padding:1.25rem;border:1px solid var(--sand)}
+.stat-n{font-family:'Playfair Display',serif;font-size:2rem;color:var(--rose-deep);display:block;margin-bottom:.2rem}
+.stat-l{font-size:.78rem;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em}
+.section-title{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1.25rem}
+.table-wrap{background:white;border-radius:14px;border:1px solid var(--sand);overflow:hidden;margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse}
+th{background:var(--cream);padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:500;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--sand)}
+td{padding:.85rem 1rem;font-size:.875rem;border-bottom:1px solid #FAF7F2;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--cream)}
+.status{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
+.status.pending{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
+.status.approved{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
+.status.rejected{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2}
+.action-btns{display:flex;gap:.4rem}
+.abtn{padding:.3rem .75rem;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:all .2s}
+.abtn.approve{background:#E8F5E9;color:#2E7D32}
+.abtn.approve:hover{background:#4CAF50;color:white}
+.abtn.reject{background:#FFEBEE;color:#C62828}
+.abtn.reject:hover{background:#F44336;color:white}
+.abtn.del{background:#FFEBEE;color:#C62828}
+.abtn.del:hover{background:#F44336;color:white}
+.user-role{display:inline-flex;align-items:center;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
+.user-role.admin{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
+.user-role.user{background:#E8F0FF;color:#1565C0;border:1px solid #BBDEFB}
+.tabs-bar{display:flex;gap:.5rem;margin-bottom:1.25rem}
+.tab{padding:.4rem 1rem;border-radius:999px;font-size:.8rem;font-weight:500;border:1.5px solid var(--sand);background:white;color:var(--taupe);cursor:pointer;transition:all .2s}
+.tab.active{background:var(--espresso);color:white;border-color:var(--espresso)}
+.empty{text-align:center;padding:3rem;color:var(--taupe);font-size:.875rem}
+.msg-flash{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;display:none}
+.msg-flash.ok{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;display:block}
+.msg-flash.err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;display:block}
+.not-admin{display:none;text-align:center;padding:4rem 2rem}
+.not-admin .icon{font-size:4rem;margin-bottom:1rem}
+.not-admin h2{font-family:'Playfair Display',serif;margin-bottom:.5rem}
+.not-admin p{color:var(--taupe);margin-bottom:1.5rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Glow<span>Up</span> <span style="font-size:.8rem;color:#A0897A;font-family:'DM Sans',sans-serif;font-style:normal">Admin</span></a>
+  <div class="nav-r">
+    <span id="nav-user" style="color:#A0897A"></span>
+    <span class="admin-badge">⚙️ Admin</span>
+    <a href="index.html">Trang chủ</a>
+    <a href="#" onclick="logout()">Đăng xuất</a>
+  </div>
+</nav>
+
+<div id="not-admin" class="not-admin">
+  <div class="icon">🚫</div>
+  <h2>Không có quyền truy cập</h2>
+  <p>Trang này chỉ dành cho Admin.</p>
+  <a href="index.html" style="color:var(--rose-deep);text-decoration:none;font-weight:500">← Về trang chủ</a>
+</div>
+
+<div id="admin-layout" class="layout" style="display:none">
+  <div class="sidebar">
+    <div class="sidebar-item active" onclick="showPage('dashboard')"><span class="sidebar-icon">📊</span> Tổng quan</div>
+    <div class="sidebar-item" onclick="showPage('reviews')"><span class="sidebar-icon">📝</span> Kiểm duyệt review</div>
+    <div class="sidebar-item" onclick="showPage('users')"><span class="sidebar-icon">👥</span> Quản lý user</div>
+    <div class="sidebar-item" onclick="showPage('comments')"><span class="sidebar-icon">💬</span> Bình luận</div>
+  </div>
+
+  <div class="content">
+    <div id="flash" class="msg-flash"></div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="section-title">Tổng quan hệ thống</div>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="stat-n" id="d-reviews">—</span><span class="stat-l">Review đã duyệt</span></div>
+        <div class="stat-card"><span class="stat-n" id="d-pending">—</span><span class="stat-l">Chờ duyệt</span></div>
+        <div class="stat-card"><span class="stat-n" id="d-users">—</span><span class="stat-l">Thành viên</span></div>
+        <div class="stat-card"><span class="stat-n" id="d-comments">—</span><span class="stat-l">Bình luận</span></div>
+      </div>
+      <div class="section-title">Review mới cần duyệt</div>
+      <div id="dash-pending"></div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div id="page-reviews" class="page">
+      <div class="section-title">Kiểm duyệt Review</div>
+      <div class="tabs-bar">
+        <span class="tab active" onclick="loadReviews('pending',this)">⏳ Chờ duyệt</span>
+        <span class="tab" onclick="loadReviews('approved',this)">✅ Đã duyệt</span>
+        <span class="tab" onclick="loadReviews('rejected',this)">❌ Từ chối</span>
+      </div>
+      <div id="reviews-table"></div>
+    </div>
+
+    <!-- USERS -->
+    <div id="page-users" class="page">
+      <div class="section-title">Quản lý thành viên</div>
+      <div id="users-table"></div>
+    </div>
+
+    <!-- COMMENTS -->
+    <div id="page-comments" class="page">
+      <div class="section-title">Bình luận gần đây</div>
+      <div id="comments-table"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const db = window.supabase.createClient(
+  'https://mojgtzjmscmztswhzwzv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0'
+);
+
+window.addEventListener('load', async () => {
+  const { data:{ user } } = await db.auth.getUser();
+  if (!user) { location.href = 'auth.html'; return; }
+  const { data: p } = await db.from('profiles').select('username,role').eq('id', user.id).single();
+  if (!p || p.role !== 'admin') {
+    document.getElementById('not-admin').style.display = 'block';
+    return;
+  }
+  document.getElementById('nav-user').textContent = '👤 ' + p.username;
+  document.getElementById('admin-layout').style.display = 'flex';
+  loadDashboard();
+});
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name==='reviews')  loadReviews('pending');
+  if (name==='users')    loadUsers();
+  if (name==='comments') loadComments();
+}
+
+function flash(msg, type) {
+  const el = document.getElementById('flash');
+  el.textContent = msg; el.className = 'msg-flash ' + type;
+  setTimeout(() => { el.className = 'msg-flash'; }, 3000);
+}
+
+async function loadDashboard() {
+  const [{ count:ra }, { count:rp }, { count:uc }, { count:cc }] = await Promise.all([
+    db.from('reviews').select('*',{count:'exact',head:true}).eq('status','approved'),
+    db.from('reviews').select('*',{count:'exact',head:true}).eq('status','pending'),
+    db.from('profiles').select('*',{count:'exact',head:true}),
+    db.from('comments').select('*',{count:'exact',head:true}),
+  ]);
+  document.getElementById('d-reviews').textContent  = ra||0;
+  document.getElementById('d-pending').textContent  = rp||0;
+  document.getElementById('d-users').textContent    = uc||0;
+  document.getElementById('d-comments').textContent = cc||0;
+  const { data: pending } = await db.from('reviews').select('*').eq('status','pending').order('created_at',{ascending:false}).limit(5);
+  const wrap = document.getElementById('dash-pending');
+  if (!pending||!pending.length) { wrap.innerHTML='<div class="empty">Không có review nào chờ duyệt 🎉</div>'; return; }
+  wrap.innerHTML = reviewTable(pending);
+}
+
+async function loadReviews(status, tabEl) {
+  if (tabEl) { document.querySelectorAll('#page-reviews .tab').forEach(t=>t.classList.remove('active')); tabEl.classList.add('active'); }
+  const { data } = await db.from('reviews').select('*').eq('status',status).order('created_at',{ascending:false});
+  document.getElementById('reviews-table').innerHTML = data?.length ? reviewTable(data) : '<div class="empty">Không có review nào.</div>';
+}
+
+function reviewTable(rows) {
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Sản phẩm</th><th>Thương hiệu</th><th>Điểm</th><th>Trạng thái</th><th>Ngày</th><th>Hành động</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr>
+      <td><strong>${r.product_name}</strong><div style="font-size:.75rem;color:var(--taupe)">${r.title||''}</div></td>
+      <td>${r.brand||''}</td>
+      <td><strong>${r.rating||0}</strong>/10</td>
+      <td><span class="status ${r.status}">${r.status==='pending'?'⏳ Chờ duyệt':r.status==='approved'?'✅ Đã duyệt':'❌ Từ chối'}</span></td>
+      <td style="font-size:.75rem;color:var(--taupe)">${new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
+      <td><div class="action-btns">
+        ${r.status!=='approved' ? `<button class="abtn approve" onclick="updateReview('${r.id}','approved')">✅ Duyệt</button>` : ''}
+        ${r.status!=='rejected' ? `<button class="abtn reject" onclick="updateReview('${r.id}','rejected')">❌ Từ chối</button>` : ''}
+        <button class="abtn del" onclick="deleteReview('${r.id}')">🗑️ Xoá</button>
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function updateReview(id, status) {
+  const { error } = await db.from('reviews').update({ status }).eq('id', id);
+  if (error) flash('Lỗi: ' + error.message, 'err');
+  else { flash(status==='approved' ? '✅ Đã duyệt review!' : '❌ Đã từ chối review!', 'ok'); loadDashboard(); loadReviews(status); }
+}
+
+async function deleteReview(id) {
+  if (!confirm('Bạn chắc chắn muốn xoá review này?')) return;
+  const { error } = await db.from('reviews').delete().eq('id', id);
+  if (error) flash('Lỗi: ' + error.message, 'err');
+  else { flash('🗑️ Đã xoá review!', 'ok'); loadDashboard(); }
+}
+
+async function loadUsers() {
+  const { data } = await db.from('profiles').select('*').order('created_at',{ascending:false});
+  const wrap = document.getElementById('users-table');
+  if (!data?.length) { wrap.innerHTML='<div class="empty">Chưa có thành viên nào.</div>'; return; }
+  wrap.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Tên</th><th>Quyền</th><th>Ngày tham gia</th><th>Hành động</th></tr></thead>
+    <tbody>${data.map(u=>`<tr>
+      <td><strong>${u.username||'—'}</strong></td>
+      <td><span class="user-role ${u.role}">${u.role==='admin'?'⚙️ Admin':'👤 User'}</span></td>
+      <td style="font-size:.75rem;color:var(--taupe)">${new Date(u.created_at).toLocaleDateString('vi-VN')}</td>
+      <td><div class="action-btns">
+        ${u.role!=='admin' ? `<button class="abtn approve" onclick="setRole('${u.id}','admin')">⬆️ Thăng Admin</button>` : `<button class="abtn reject" onclick="setRole('${u.id}','user')">⬇️ Hạ User</button>`}
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function setRole(id, role) {
+  const { error } = await db.from('profiles').update({ role }).eq('id', id);
+  if (error) flash('Lỗi: ' + error.message, 'err');
+  else { flash('✅ Đã cập nhật quyền!', 'ok'); loadUsers(); }
+}
+
+async function loadComments() {
+  const { data } = await db.from('comments').select('*').order('created_at',{ascending:false}).limit(50);
+  const wrap = document.getElementById('comments-table');
+  if (!data?.length) { wrap.innerHTML='<div class="empty">Chưa có bình luận nào.</div>'; return; }
+  wrap.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Nội dung</th><th>Review ID</th><th>Ngày</th><th>Hành động</th></tr></thead>
+    <tbody>${data.map(c=>`<tr>
+      <td>${c.content}</td>
+      <td style="font-size:.72rem;color:var(--taupe)">${c.review_id?.slice(0,8)}...</td>
+      <td style="font-size:.75rem;color:var(--taupe)">${new Date(c.created_at).toLocaleDateString('vi-VN')}</td>
+      <td><button class="abtn del" onclick="deleteComment('${c.id}')">🗑️ Xoá</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function deleteComment(id) {
+  if (!confirm('Xoá bình luận này?')) return;
+  const { error } = await db.from('comments').delete().eq('id', id);
+  if (error) flash('Lỗi: '+error.message,'err');
+  else { flash('🗑️ Đã xoá!','ok'); loadComments(); }
+}
+
+async function logout() { await db.auth.signOut(); location.href = 'auth.html'; }
+</script>
+</body>
+</html>

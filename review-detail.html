@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp — Chi tiết Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--rose:#F2A7B4;--rose-deep:#C96B80;--cream:#FDF6EE;--sand:#E8DDD0;--espresso:#3B2A2A;--taupe:#8A7567;--gold:#C9A96B}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--espresso)}
+nav{background:var(--cream);border-bottom:1px solid var(--sand);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--espresso);text-decoration:none}
+.logo span{color:var(--rose-deep);font-style:italic}
+.nav-r{display:flex;align-items:center;gap:1rem;font-size:.85rem}
+.nav-r a{color:var(--taupe);text-decoration:none}
+.nav-r a:hover{color:var(--rose-deep)}
+.back-btn{display:inline-flex;align-items:center;gap:.4rem;color:var(--taupe);text-decoration:none;font-size:.85rem;margin-bottom:1.5rem;transition:color .2s}
+.back-btn:hover{color:var(--rose-deep)}
+.container{max-width:760px;margin:0 auto;padding:2.5rem 1.5rem}
+.card{background:white;border-radius:20px;padding:2rem;border:1px solid var(--sand);margin-bottom:1.25rem;box-shadow:0 4px 24px rgba(59,42,42,.04)}
+.product-img{width:100%;height:280px;object-fit:cover;border-radius:14px;margin-bottom:1.5rem;display:block}
+.product-img-placeholder{width:100%;height:280px;border-radius:14px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;font-size:5rem;background:linear-gradient(135deg,#FFE8EC,#FFD0DA)}
+.cat-badge{display:inline-flex;align-items:center;font-size:.72rem;font-weight:500;padding:.25rem .75rem;border-radius:999px;background:#FDF0F3;color:var(--rose-deep);border:1px solid var(--rose);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.06em}
+.product-name{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.2;margin-bottom:.4rem}
+.brand{color:var(--taupe);font-size:.9rem;margin-bottom:1rem}
+.meta-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.rating-big{font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--rose-deep);line-height:1}
+.stars-big{color:var(--gold);font-size:1.1rem;letter-spacing:2px}
+.author-info{display:flex;align-items:center;gap:.6rem}
+.av-sm{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:.9rem;color:white;font-weight:500;font-family:'Playfair Display',serif;flex-shrink:0}
+.author-name{font-size:.85rem;font-weight:500}
+.author-date{font-size:.75rem;color:var(--taupe)}
+.review-title{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:.75rem}
+.review-content{font-size:.95rem;line-height:1.8;color:#5A4A4A;margin-bottom:1.25rem}
+.pro-con{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+.pro-box,.con-box{padding:1rem;border-radius:12px;font-size:.85rem}
+.pro-box{background:#E8F5E9;border:1px solid #A5D6A7}
+.con-box{background:#FFEBEE;border:1px solid #FFCDD2}
+.pc-label{font-weight:500;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.pro-box .pc-label{color:#2E7D32}
+.con-box .pc-label{color:#C62828}
+.criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.crit{background:var(--cream);border-radius:10px;padding:.75rem 1rem}
+.crit-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--taupe);margin-bottom:.4rem}
+.crit-bar{height:6px;background:var(--sand);border-radius:999px;margin-bottom:.3rem;overflow:hidden}
+.crit-fill{height:100%;background:var(--rose-deep);border-radius:999px}
+.crit-val{font-weight:500;font-size:.85rem}
+.tags-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}
+.tag{padding:.25rem .7rem;border-radius:999px;background:var(--cream);border:1px solid var(--sand);font-size:.75rem;color:var(--taupe)}
+.rec-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:999px;font-size:.85rem;font-weight:500}
+.rec-yes{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
+.rec-no{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2}
+.rec-maybe{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
+.action-row{display:flex;gap:.75rem;padding-top:1rem;border-top:1px solid var(--sand);margin-top:1rem}
+.action-btn{display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;border:1.5px solid var(--sand);background:white;color:var(--espresso);transition:all .2s}
+.action-btn:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
+.action-btn.liked{background:#FFE8EC;border-color:var(--rose);color:var(--rose-deep)}
+
+/* COMMENTS */
+.comments-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}
+.comment{display:flex;gap:.75rem}
+.comment-body{flex:1;background:var(--cream);border-radius:12px;padding:.75rem 1rem}
+.comment-meta{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
+.comment-name{font-size:.85rem;font-weight:500}
+.comment-date{font-size:.75rem;color:var(--taupe)}
+.comment-text{font-size:.875rem;line-height:1.6;color:#5A4A4A}
+.comment-form{display:flex;gap:.75rem;align-items:flex-end}
+.comment-form textarea{flex:1;padding:.75rem 1rem;border:1.5px solid var(--sand);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--espresso);outline:none;resize:none;min-height:80px;transition:border-color .2s;background:white}
+.comment-form textarea:focus{border-color:var(--rose-deep)}
+.comment-form button{padding:.75rem 1.25rem;background:var(--espresso);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
+.comment-form button:hover{background:var(--rose-deep)}
+.login-prompt{background:var(--cream);border-radius:12px;padding:1rem;text-align:center;font-size:.875rem;color:var(--taupe)}
+.login-prompt a{color:var(--rose-deep);font-weight:500;text-decoration:none}
+.loading{text-align:center;padding:3rem;color:var(--taupe)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Glow<span>Up</span></a>
+  <div class="nav-r">
+    <a href="index.html">Trang chủ</a>
+    <a href="auth.html">Tài khoản</a>
+  </div>
+</nav>
+
+<div class="container">
+  <a href="index.html" class="back-btn">← Quay lại trang chủ</a>
+  <div id="content"><div class="loading card">⏳ Đang tải...</div></div>
+</div>
+
+<script>
+const db = window.supabase.createClient(
+  'https://mojgtzjmscmztswhzwzv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0'
+);
+
+const id = new URLSearchParams(location.search).get('id');
+let currentUser = null;
+let liked = false;
+
+const EMOJIS = {skincare:'💆',makeup:'💄',haircare:'💇',perfume:'🌸',sunscreen:'☀️',other:'✨'};
+const REC = {yes:'👍 Có, tôi recommend!', no:'👎 Không recommend', maybe:'🤔 Tuỳ người dùng'};
+const REC_CLASS = {yes:'rec-yes', no:'rec-no', maybe:'rec-maybe'};
+
+window.addEventListener('load', async () => {
+  if (!id) { document.getElementById('content').innerHTML = '<div class="card" style="text-align:center;padding:3rem">Review không tồn tại.</div>'; return; }
+  const { data:{ user } } = await db.auth.getUser();
+  currentUser = user;
+  const { data: r } = await db.from('reviews').select('*').eq('id', id).single();
+  if (!r) { document.getElementById('content').innerHTML = '<div class="card" style="text-align:center;padding:3rem">Review không tồn tại hoặc chưa được duyệt.</div>'; return; }
+
+  const { data: profile } = await db.from('profiles').select('username').eq('id', r.user_id).single();
+  const uname = profile?.username || 'Ẩn danh';
+  const stars = '★'.repeat(Math.round((r.rating||0)/2)) + '☆'.repeat(5-Math.round((r.rating||0)/2));
+  const date  = new Date(r.created_at).toLocaleDateString('vi-VN');
+  const emoji = EMOJIS[r.category]||'✨';
+
+  if (currentUser) {
+    const { data: lk } = await db.from('likes').select('id').eq('review_id',id).eq('user_id',currentUser.id).single();
+    liked = !!lk;
+  }
+
+  const { count: likeCount } = await db.from('likes').select('*',{count:'exact',head:true}).eq('review_id',id);
+
+  document.getElementById('content').innerHTML = `
+  <div class="card">
+    ${r.image_url ? `<img class="product-img" src="${r.image_url}" alt="${r.product_name}">` : `<div class="product-img-placeholder">${emoji}</div>`}
+    <div class="cat-badge">${r.category||'review'}</div>
+    <div class="product-name">${r.product_name}</div>
+    <div class="brand">${r.brand||''} ${r.price ? '· ' + r.price : ''}</div>
+    <div class="meta-row">
+      <div>
+        <div class="rating-big">${r.rating||0}<span style="font-size:1rem;color:var(--taupe)">/10</span></div>
+        <div class="stars-big">${stars}</div>
+      </div>
+      <div class="author-info">
+        <div class="av-sm">${uname.charAt(0).toUpperCase()}</div>
+        <div><div class="author-name">${uname}</div><div class="author-date">${date}</div></div>
+      </div>
+      ${r.recommend ? `<div class="rec-badge ${REC_CLASS[r.recommend]||''}">${REC[r.recommend]||''}</div>` : ''}
+    </div>
+
+    ${r.title ? `<div class="review-title">${r.title}</div>` : ''}
+    <div class="review-content">${(r.content||'').replace(/\n/g,'<br>')}</div>
+
+    ${(r.pros||r.cons) ? `<div class="pro-con">
+      ${r.pros ? `<div class="pro-box"><div class="pc-label">✅ Ưu điểm</div>${r.pros}</div>` : ''}
+      ${r.cons ? `<div class="con-box"><div class="pc-label">❌ Nhược điểm</div>${r.cons}</div>` : ''}
+    </div>` : ''}
+
+    ${(r.score_effect||r.score_texture||r.score_value||r.score_design) ? `<div class="criteria-grid">
+      ${r.score_effect  ? `<div class="crit"><div class="crit-label">Hiệu quả</div><div class="crit-bar"><div class="crit-fill" style="width:${r.score_effect*10}%"></div></div><div class="crit-val">${r.score_effect}/10</div></div>` : ''}
+      ${r.score_texture ? `<div class="crit"><div class="crit-label">Kết cấu</div><div class="crit-bar"><div class="crit-fill" style="width:${r.score_texture*10}%"></div></div><div class="crit-val">${r.score_texture}/10</div></div>` : ''}
+      ${r.score_value   ? `<div class="crit"><div class="crit-label">Giá trị</div><div class="crit-bar"><div class="crit-fill" style="width:${r.score_value*10}%"></div></div><div class="crit-val">${r.score_value}/10</div></div>` : ''}
+      ${r.score_design  ? `<div class="crit"><div class="crit-label">Bao bì</div><div class="crit-bar"><div class="crit-fill" style="width:${r.score_design*10}%"></div></div><div class="crit-val">${r.score_design}/10</div></div>` : ''}
+    </div>` : ''}
+
+    ${r.tags?.length ? `<div class="tags-row">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+
+    <div class="action-row">
+      <button class="action-btn ${liked?'liked':''}" id="like-btn" onclick="toggleLike()">
+        ${liked?'🩷':'🤍'} Thích <span id="like-count">${likeCount||0}</span>
+      </button>
+      <button class="action-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='✅ Đã copy!')">🔗 Chia sẻ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title" style="font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:1.25rem">💬 Bình luận</div>
+    <div id="comments-list" class="comments-list"></div>
+    <div id="comment-form-wrap"></div>
+  </div>`;
+
+  loadComments();
+  renderCommentForm();
+});
+
+async function toggleLike() {
+  if (!currentUser) { location.href = 'auth.html'; return; }
+  const btn = document.getElementById('like-btn');
+  const countEl = document.getElementById('like-count');
+  let count = parseInt(countEl.textContent)||0;
+  if (liked) {
+    await db.from('likes').delete().eq('review_id',id).eq('user_id',currentUser.id);
+    liked = false; count--;
+    btn.className = 'action-btn';
+    btn.innerHTML = `🤍 Thích <span id="like-count">${count}</span>`;
+  } else {
+    await db.from('likes').insert({review_id:id, user_id:currentUser.id});
+    liked = true; count++;
+    btn.className = 'action-btn liked';
+    btn.innerHTML = `🩷 Thích <span id="like-count">${count}</span>`;
+  }
+}
+
+async function loadComments() {
+  const { data: comments } = await db.from('comments').select('*').eq('review_id',id).order('created_at',{ascending:true});
+  const list = document.getElementById('comments-list');
+  if (!comments || comments.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--taupe);font-size:.875rem;padding:1rem">Chưa có bình luận nào. Hãy là người đầu tiên!</div>';
+    return;
+  }
+  const userIds = [...new Set(comments.map(c => c.user_id))];
+  const { data: profiles } = await db.from('profiles').select('id,username').in('id', userIds);
+  const profileMap = {};
+  profiles?.forEach(p => profileMap[p.id] = p.username);
+
+  list.innerHTML = comments.map(c => {
+    const uname = profileMap[c.user_id] || 'Ẩn danh';
+    const date  = new Date(c.created_at).toLocaleDateString('vi-VN');
+    return `<div class="comment">
+      <div class="av-sm">${uname.charAt(0).toUpperCase()}</div>
+      <div class="comment-body">
+        <div class="comment-meta">
+          <span class="comment-name">${uname}</span>
+          <span class="comment-date">${date}</span>
+        </div>
+        <div class="comment-text">${c.content}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCommentForm() {
+  const wrap = document.getElementById('comment-form-wrap');
+  if (!currentUser) {
+    wrap.innerHTML = `<div class="login-prompt">Vui lòng <a href="auth.html">đăng nhập</a> để bình luận.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="comment-form">
+    <textarea id="comment-input" placeholder="Viết bình luận của bạn..."></textarea>
+    <button onclick="postComment()">Gửi</button>
+  </div>`;
+}
+
+async function postComment() {
+  const content = document.getElementById('comment-input').value.trim();
+  if (!content) return;
+  const { error } = await db.from('comments').insert({ review_id:id, user_id:currentUser.id, content });
+  if (!error) {
+    document.getElementById('comment-input').value = '';
+    await loadComments();
+  }
+}
+</script>
+</body>
+</html>

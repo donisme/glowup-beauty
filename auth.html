@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp — Đăng nhập</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --rose:#F2A7B4;--rose-deep:#C96B80;--cream:#FDF6EE;
+  --sand:#E8DDD0;--espresso:#3B2A2A;--taupe:#8A7567;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--espresso);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.wrap{width:100%;max-width:420px}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;text-align:center;margin-bottom:.25rem}
+.logo span{color:var(--rose-deep);font-style:italic}
+.tagline{text-align:center;font-size:.85rem;color:var(--taupe);margin-bottom:2rem}
+.card{background:white;border-radius:20px;padding:2rem;border:1px solid var(--sand);box-shadow:0 4px 24px rgba(59,42,42,.06);animation:up .3s ease}
+.tabs{display:flex;background:var(--cream);border-radius:999px;padding:4px;margin-bottom:1.75rem}
+.tab{flex:1;padding:.5rem;border:none;background:transparent;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;color:var(--taupe);cursor:pointer;transition:all .2s}
+.tab.active{background:white;color:var(--espresso);box-shadow:0 2px 8px rgba(59,42,42,.08)}
+.fg{margin-bottom:1rem}
+label{display:block;font-size:.78rem;font-weight:500;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+input{width:100%;padding:.75rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--espresso);background:white;outline:none;transition:border-color .2s}
+input:focus{border-color:var(--rose-deep)}
+input::placeholder{color:#C4B5AA}
+.btn{width:100%;padding:.85rem;background:var(--espresso);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s;margin-top:.5rem}
+.btn:hover{background:var(--rose-deep);transform:translateY(-1px)}
+.btn:disabled{background:var(--sand);color:var(--taupe);cursor:not-allowed;transform:none}
+.msg{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;display:none}
+.msg.ok{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;display:block}
+.msg.err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;display:block}
+.loggedin{display:none;text-align:center}
+.avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem;color:white;font-family:'Playfair Display',serif}
+.uname{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:.5rem}
+.badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:500;padding:.25rem .75rem;border-radius:999px;margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.06em}
+.badge.admin{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
+.badge.user{background:#F3E5F5;color:#6A1B9A;border:1px solid #CE93D8}
+.actions{display:flex;flex-direction:column;gap:.75rem}
+.abtn{padding:.75rem 1rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none;display:block}
+.abtn.p{background:var(--espresso);color:white;border:none}
+.abtn.p:hover{background:var(--rose-deep)}
+.abtn.s{background:white;color:var(--espresso);border:1.5px solid var(--sand)}
+.abtn.s:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
+.abtn.d{background:white;color:#C62828;border:1.5px solid #FFCDD2}
+.abtn.d:hover{background:#FFEBEE}
+.back{text-align:center;margin-top:1.5rem;font-size:.8rem;color:var(--taupe)}
+.back a{color:var(--rose-deep);text-decoration:none;font-weight:500}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Glow<span>Up</span></div>
+  <div class="tagline">Review mỹ phẩm trung thực từ cộng đồng</div>
+  <div class="card">
+
+    <div id="auth-form">
+      <div class="tabs">
+        <button class="tab active" id="tl" onclick="sw('login')">Đăng nhập</button>
+        <button class="tab" id="tr" onclick="sw('register')">Đăng ký</button>
+      </div>
+      <div id="msg" class="msg"></div>
+      <div class="fg" id="ug" style="display:none">
+        <label>Tên hiển thị</label>
+        <input type="text" id="username" placeholder="Tên của bạn">
+      </div>
+      <div class="fg">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="email@example.com">
+      </div>
+      <div class="fg">
+        <label>Mật khẩu</label>
+        <input type="password" id="password" placeholder="Ít nhất 6 ký tự">
+      </div>
+      <button class="btn" id="abtn" onclick="go()">Đăng nhập</button>
+    </div>
+
+    <div id="loggedin" class="loggedin">
+      <div class="avatar" id="av">👤</div>
+      <div class="uname" id="un">Xin chào!</div>
+      <div class="badge user" id="bd">✦ Thành viên</div>
+      <div class="actions">
+        <a href="index.html" class="abtn p">🏠 Về trang chủ</a>
+        <a href="admin.html" class="abtn s" id="admbtn" style="display:none">⚙️ Quản trị Admin</a>
+        <a href="post-review.html" class="abtn s">✍️ Viết review mới</a>
+        <a href="chat.html" class="abtn s">💬 Chat cộng đồng</a>
+        <button class="abtn d" onclick="out()">Đăng xuất</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="back"><a href="index.html">← Quay lại trang chủ</a></div>
+</div>
+
+<script>
+const db = window.supabase.createClient(
+  'https://mojgtzjmscmztswhzwzv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0'
+);
+
+let tab = 'login';
+
+window.addEventListener('load', async () => {
+  const { data:{ user } } = await db.auth.getUser();
+  if (user) await show(user);
+});
+
+function sw(t) {
+  tab = t;
+  document.getElementById('tl').classList.toggle('active', t==='login');
+  document.getElementById('tr').classList.toggle('active', t==='register');
+  document.getElementById('ug').style.display = t==='register' ? 'block' : 'none';
+  document.getElementById('abtn').textContent = t==='login' ? 'Đăng nhập' : 'Đăng ký';
+  clr();
+}
+
+function setMsg(txt, type) {
+  const el = document.getElementById('msg');
+  el.textContent = txt; el.className = 'msg ' + type;
+}
+function clr() {
+  const el = document.getElementById('msg');
+  el.className = 'msg'; el.textContent = '';
+}
+
+async function go() {
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  const uname = document.getElementById('username').value.trim();
+  const btn   = document.getElementById('abtn');
+  if (!email || !pass) return setMsg('Vui lòng điền email và mật khẩu.', 'err');
+  if (tab==='register' && !uname) return setMsg('Vui lòng nhập tên hiển thị.', 'err');
+  btn.disabled = true; btn.textContent = 'Đang xử lý...';
+
+  if (tab === 'login') {
+    const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+    if (error) setMsg('Email hoặc mật khẩu không đúng.', 'err');
+    else await show(data.user);
+  } else {
+    const { data, error } = await db.auth.signUp({ email, password: pass, options: { data: { username: uname } } });
+    if (error) {
+      setMsg('Đăng ký thất bại: ' + error.message, 'err');
+    } else {
+      if (data.user) {
+        await db.from('profiles').upsert({ id: data.user.id, username: uname, role: 'user' });
+        await show(data.user, uname);
+        return;
+      }
+      setMsg('Đăng ký thành công! Hãy đăng nhập.', 'ok');
+      sw('login');
+    }
+  }
+  btn.disabled = false;
+  btn.textContent = tab==='login' ? 'Đăng nhập' : 'Đăng ký';
+}
+
+async function show(user, fallbackName) {
+  const { data: p } = await db.from('profiles').select('username,role').eq('id', user.id).single();
+  const uname = fallbackName || p?.username || user.email.split('@')[0];
+  const role  = p?.role || 'user';
+  document.getElementById('auth-form').style.display = 'none';
+  document.getElementById('loggedin').style.display  = 'block';
+  document.getElementById('un').textContent = 'Xin chào, ' + uname + '!';
+  document.getElementById('av').textContent = uname.charAt(0).toUpperCase();
+  const bd = document.getElementById('bd');
+  if (role === 'admin') {
+    bd.textContent = '⚙️ Quản trị viên'; bd.className = 'badge admin';
+    document.getElementById('admbtn').style.display = 'block';
+  } else {
+    bd.textContent = '✦ Thành viên'; bd.className = 'badge user';
+  }
+}
+
+async function out() {
+  await db.auth.signOut(); location.reload();
+}
+
+document.addEventListener('keydown', e => { if (e.key==='Enter') go(); });
+</script>
+</body>
+</html>
