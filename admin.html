@@ -57,6 +57,43 @@ tr:hover td{background:var(--cream)}
 .action-select{padding:.35rem .6rem;border:1.5px solid var(--sand);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--espresso);background:white;cursor:pointer;outline:none;transition:border-color .2s}
 .action-select:hover{border-color:var(--rose-deep)}
 .action-select:focus{border-color:var(--rose-deep)}
+
+/* WRITE REVIEW */
+.wr-card{background:white;border-radius:16px;padding:1.5rem;border:1px solid var(--sand);margin-bottom:1.25rem}
+.wr-card-title{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:1.1rem;padding-bottom:.6rem;border-bottom:1px solid var(--sand)}
+.wr-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.wr-fg{margin-bottom:.9rem}
+.wr-fg label{display:block;font-size:.75rem;font-weight:500;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem}
+.wr-fg label span{color:var(--rose-deep)}
+.wr-fg input,.wr-fg select,.wr-fg textarea{width:100%;padding:.65rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--espresso);background:white;outline:none;transition:border-color .2s}
+.wr-fg input:focus,.wr-fg select:focus,.wr-fg textarea:focus{border-color:var(--rose-deep)}
+.wr-fg textarea{resize:vertical;min-height:120px;line-height:1.6}
+.wr-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem}
+.wr-tag{padding:.25rem .75rem;border-radius:999px;font-size:.78rem;font-weight:500;border:1.5px solid var(--sand);background:white;color:var(--taupe);cursor:pointer;transition:all .15s}
+.wr-tag.sel{background:var(--espresso);color:white;border-color:var(--espresso)}
+.wr-custom-tag{display:flex;gap:.5rem;margin-top:.6rem}
+.wr-custom-tag input{flex:1;padding:.45rem .9rem;border:1.5px solid var(--sand);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;transition:border-color .2s;color:var(--espresso)}
+.wr-custom-tag input:focus{border-color:var(--rose-deep)}
+.wr-custom-tag button{padding:.45rem 1rem;background:var(--espresso);color:white;border:none;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:background .2s}
+.wr-custom-tag button:hover{background:var(--rose-deep)}
+.wr-range{display:flex;align-items:center;gap:.75rem}
+.wr-range input[type=range]{flex:1;accent-color:var(--rose-deep);border:none;padding:0;background:transparent}
+.wr-range span{font-weight:500;font-size:.875rem;color:var(--rose-deep);min-width:20px}
+.wr-upload{border:2px dashed var(--sand);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;position:relative;transition:all .2s}
+.wr-upload:hover{border-color:var(--rose-deep);background:#FDF0F3}
+.wr-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.wr-upload-text{font-size:.85rem;color:var(--taupe)}
+.wr-upload-text strong{color:var(--rose-deep)}
+.wr-preview{width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:.75rem;display:none}
+.wr-submit{width:100%;padding:.85rem;background:var(--rose-deep);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
+.wr-submit:hover{background:#A8556A;transform:translateY(-1px)}
+.wr-submit:disabled{background:var(--sand);color:var(--taupe);cursor:not-allowed;transform:none}
+.wr-msg{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;display:none}
+.wr-msg.ok{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;display:block}
+.wr-msg.err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;display:block}
+.wr-score-wrap{position:relative}
+.wr-score-wrap input{padding-right:3rem}
+.wr-score-sfx{position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--taupe);font-size:.85rem;pointer-events:none}
 .user-role{display:inline-flex;align-items:center;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
 .user-role.admin{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
 .user-role.user{background:#E8F0FF;color:#1565C0;border:1px solid #BBDEFB}
@@ -219,6 +256,7 @@ tr:hover td{background:var(--cream)}
     <div class="sidebar-item" onclick="showPage('users',this)"><span>👥</span> Quản lý user</div>
     <div class="sidebar-item" onclick="showPage('comments',this)"><span>💬</span> Bình luận</div>
     <div class="sidebar-item" onclick="showPage('tags',this)"><span>🏷️</span> Quản lý tags</div>
+    <div class="sidebar-item" onclick="showPage('write',this)"><span>✍️</span> Viết review</div>
   </div>
   <div class="content">
     <div id="flash" class="msg-flash"></div>
@@ -255,8 +293,86 @@ tr:hover td{background:var(--cream)}
       <div id="comments-table"></div>
     </div>
 
-    <div id="page-tags" class="page">
-      <div class="section-title">Quản lý Tags</div>
+    <div id="page-write" class="page">
+      <div class="section-title">✍️ Viết review mới</div>
+      <div id="wr-msg" class="wr-msg"></div>
+
+      <div class="wr-card">
+        <div class="wr-card-title">📦 Thông tin sản phẩm</div>
+        <div class="wr-row">
+          <div class="wr-fg"><label>Tên sản phẩm <span>*</span></label><input type="text" id="wr-pname" placeholder="VD: Pillow Talk Lipstick"></div>
+          <div class="wr-fg"><label>Thương hiệu <span>*</span></label><input type="text" id="wr-brand" placeholder="VD: Charlotte Tilbury"></div>
+        </div>
+        <div class="wr-row">
+          <div class="wr-fg"><label>Danh mục <span>*</span></label>
+            <select id="wr-cat">
+              <option value="">Chọn danh mục...</option>
+              <option value="skincare">Dưỡng da</option>
+              <option value="makeup">Trang điểm</option>
+              <option value="haircare">Tóc & Body</option>
+              <option value="perfume">Nước hoa</option>
+              <option value="sunscreen">Chống nắng</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+          <div class="wr-fg"><label>Giá tham khảo</label><input type="text" id="wr-price" placeholder="VD: 850.000đ"></div>
+        </div>
+        <div class="wr-fg">
+          <label>Tags</label>
+          <div class="wr-tags" id="wr-tags-wrap">⏳ Đang tải...</div>
+          <div class="wr-custom-tag">
+            <input type="text" id="wr-custom-tag" placeholder="Thêm tag mới..." onkeydown="if(event.key==='Enter'){event.preventDefault();wrAddTag()}">
+            <button onclick="wrAddTag()">+ Thêm</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-card">
+        <div class="wr-card-title">✍️ Nội dung review</div>
+        <div class="wr-fg"><label>Tiêu đề <span>*</span></label><input type="text" id="wr-title" placeholder="VD: Son đẹp nhất tôi từng dùng!"></div>
+        <div class="wr-fg"><label>Nội dung chi tiết <span>*</span></label><textarea id="wr-content" placeholder="Chia sẻ trải nghiệm: kết cấu, mùi hương, hiệu quả..."></textarea></div>
+        <div class="wr-row">
+          <div class="wr-fg"><label>Ưu điểm</label><input type="text" id="wr-pros" placeholder="Màu đẹp, giữ màu tốt..."></div>
+          <div class="wr-fg"><label>Nhược điểm</label><input type="text" id="wr-cons" placeholder="Giá hơi cao..."></div>
+        </div>
+      </div>
+
+      <div class="wr-card">
+        <div class="wr-card-title">⭐ Đánh giá</div>
+        <div class="wr-row">
+          <div class="wr-fg">
+            <label>Điểm tổng thể <span>*</span> (1–10)</label>
+            <div class="wr-score-wrap"><input type="number" id="wr-rating" min="1" max="10" step="0.1" placeholder="8.5"><span class="wr-score-sfx">/ 10</span></div>
+          </div>
+          <div class="wr-fg"><label>Recommend?</label>
+            <select id="wr-rec">
+              <option value="yes">👍 Có, recommend!</option>
+              <option value="maybe">🤔 Tuỳ người dùng</option>
+              <option value="no">👎 Không recommend</option>
+            </select>
+          </div>
+        </div>
+        <div class="wr-row">
+          <div class="wr-fg"><label>Hiệu quả</label><div class="wr-range"><input type="range" min="1" max="10" value="8" id="wr-eff" oninput="document.getElementById('wr-v-eff').textContent=this.value"><span id="wr-v-eff">8</span></div></div>
+          <div class="wr-fg"><label>Kết cấu</label><div class="wr-range"><input type="range" min="1" max="10" value="8" id="wr-tex" oninput="document.getElementById('wr-v-tex').textContent=this.value"><span id="wr-v-tex">8</span></div></div>
+          <div class="wr-fg"><label>Giá trị</label><div class="wr-range"><input type="range" min="1" max="10" value="8" id="wr-val" oninput="document.getElementById('wr-v-val').textContent=this.value"><span id="wr-v-val">8</span></div></div>
+          <div class="wr-fg"><label>Bao bì</label><div class="wr-range"><input type="range" min="1" max="10" value="8" id="wr-des" oninput="document.getElementById('wr-v-des').textContent=this.value"><span id="wr-v-des">8</span></div></div>
+        </div>
+      </div>
+
+      <div class="wr-card">
+        <div class="wr-card-title">📸 Ảnh sản phẩm</div>
+        <div class="wr-upload">
+          <input type="file" id="wr-img" accept="image/*" onchange="wrPreview(this)">
+          <div class="wr-upload-text"><strong>Nhấn để chọn ảnh</strong> hoặc kéo thả<br><span style="font-size:.75rem;color:#C4B5AA">JPG, PNG, WEBP — tối đa 5MB</span></div>
+          <img class="wr-preview" id="wr-prev" src="" alt="">
+        </div>
+      </div>
+
+      <button class="wr-submit" id="wr-btn" onclick="wrSubmit()">🚀 Đăng review ngay</button>
+    </div>
+
+    <div id="page-tags" class="page">      <div class="section-title">Quản lý Tags</div>
       <div style="display:flex;gap:.75rem;margin-bottom:1.5rem">
         <input type="text" id="new-tag-input" placeholder="Nhập tên tag mới..." style="flex:1;padding:.65rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--espresso);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--rose-deep)'" onblur="this.style.borderColor='var(--sand)'" onkeydown="if(event.key==='Enter')addAdminTag()">
         <button onclick="addAdminTag()" style="padding:.65rem 1.5rem;background:var(--espresso);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--rose-deep)'" onmouseout="this.style.background='var(--espresso)'">+ Thêm tag</button>
@@ -300,6 +416,7 @@ function showPage(name, el) {
   if (name==='users')    loadUsers();
   if (name==='comments') loadComments();
   if (name==='tags')     loadAdminTags('all');
+  if (name==='write')    initWritePage();
 }
 
 function flash(msg, type) {
@@ -551,6 +668,142 @@ async function deleteComment(id) {
   const { error } = await db.from('comments').delete().eq('id', id);
   if (error) flash('Lỗi: '+error.message,'err');
   else { flash('🗑️ Đã xoá!','ok'); loadComments(); }
+}
+
+// ===== WRITE REVIEW =====
+let wrTags = [];
+let wrSelectedTags = [];
+let wrUser = null;
+
+async function initWritePage() {
+  if (!wrUser) {
+    const { data:{ user } } = await db.auth.getUser();
+    wrUser = user;
+  }
+  if (wrTags.length === 0) {
+    const { data } = await db.from('tags').select('*').order('is_default',{ascending:false}).order('name');
+    wrTags = data || [];
+  }
+  wrSelectedTags = [];
+  wrRenderTags();
+  // Reset form
+  ['wr-pname','wr-brand','wr-price','wr-title','wr-content','wr-pros','wr-cons','wr-rating'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('wr-cat').value = '';
+  document.getElementById('wr-rec').value = 'yes';
+  ['wr-eff','wr-tex','wr-val','wr-des'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = 8;
+  });
+  ['wr-v-eff','wr-v-tex','wr-v-val','wr-v-des'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = '8';
+  });
+  const prev = document.getElementById('wr-prev');
+  if (prev) { prev.src=''; prev.style.display='none'; }
+  document.getElementById('wr-msg').className = 'wr-msg';
+}
+
+function wrRenderTags() {
+  const wrap = document.getElementById('wr-tags-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = wrTags.map(t => `
+    <span class="wr-tag ${wrSelectedTags.includes(t.name)?'sel':''}" onclick="wrTogTag(this,'${t.name.replace(/'/g,"\\'")}')">
+      ${t.name}
+    </span>`).join('');
+}
+
+function wrTogTag(el, tag) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) wrSelectedTags.push(tag);
+  else wrSelectedTags = wrSelectedTags.filter(t => t !== tag);
+}
+
+async function wrAddTag() {
+  const input = document.getElementById('wr-custom-tag');
+  const name  = input.value.trim().toLowerCase();
+  if (!name) return;
+  if (!wrTags.find(t => t.name === name)) {
+    const { data } = await db.from('tags').insert({ name, created_by: wrUser?.id, is_default: false }).select().single();
+    if (data) wrTags.push(data);
+  }
+  if (!wrSelectedTags.includes(name)) wrSelectedTags.push(name);
+  wrRenderTags();
+  input.value = '';
+}
+
+function wrPreview(input) {
+  const file = input.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = e => { const img = document.getElementById('wr-prev'); img.src=e.target.result; img.style.display='block'; };
+  r.readAsDataURL(file);
+}
+
+function wrSetMsg(txt, type) {
+  const el = document.getElementById('wr-msg');
+  el.textContent = txt; el.className = 'wr-msg ' + type;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function wrSubmit() {
+  const pname   = document.getElementById('wr-pname').value.trim();
+  const brand   = document.getElementById('wr-brand').value.trim();
+  const cat     = document.getElementById('wr-cat').value;
+  const title   = document.getElementById('wr-title').value.trim();
+  const content = document.getElementById('wr-content').value.trim();
+  const rating  = parseFloat(document.getElementById('wr-rating').value);
+
+  if (!pname)   return wrSetMsg('Vui lòng nhập tên sản phẩm.','err');
+  if (!brand)   return wrSetMsg('Vui lòng nhập thương hiệu.','err');
+  if (!cat)     return wrSetMsg('Vui lòng chọn danh mục.','err');
+  if (!title)   return wrSetMsg('Vui lòng nhập tiêu đề.','err');
+  if (!content) return wrSetMsg('Vui lòng nhập nội dung.','err');
+  if (!rating || rating<1 || rating>10) return wrSetMsg('Điểm phải từ 1 đến 10.','err');
+
+  const btn = document.getElementById('wr-btn');
+  btn.disabled = true; btn.textContent = 'Đang đăng...';
+
+  let imageUrl = null;
+  const fileInput = document.getElementById('wr-img');
+  if (fileInput.files[0]) {
+    const file  = fileInput.files[0];
+    const fname = `${wrUser.id}-${Date.now()}.${file.name.split('.').pop()}`;
+    const { error: ue } = await db.storage.from('review-images').upload(fname, file);
+    if (!ue) {
+      const { data: ud } = db.storage.from('review-images').getPublicUrl(fname);
+      imageUrl = ud.publicUrl;
+    }
+  }
+
+  const { error } = await db.from('reviews').insert({
+    user_id:       wrUser.id,
+    product_name:  pname,
+    brand, category: cat,
+    price:         document.getElementById('wr-price').value.trim(),
+    title, content,
+    pros:          document.getElementById('wr-pros').value.trim(),
+    cons:          document.getElementById('wr-cons').value.trim(),
+    rating,
+    score_effect:  parseInt(document.getElementById('wr-eff').value),
+    score_texture: parseInt(document.getElementById('wr-tex').value),
+    score_value:   parseInt(document.getElementById('wr-val').value),
+    score_design:  parseInt(document.getElementById('wr-des').value),
+    recommend:     document.getElementById('wr-rec').value,
+    tags:          wrSelectedTags,
+    image_url:     imageUrl,
+    status:        'approved'   // Admin → đăng luôn
+  });
+
+  if (error) {
+    wrSetMsg('Lỗi: ' + error.message, 'err');
+    btn.disabled = false; btn.textContent = '🚀 Đăng review ngay';
+  } else {
+    wrSetMsg('✅ Review đã được đăng công khai!', 'ok');
+    btn.disabled = false; btn.textContent = '🚀 Đăng review ngay';
+    flash('✅ Đăng review thành công!', 'ok');
+    loadDashboard();
+    // Reset form sau 2s
+    setTimeout(() => initWritePage(), 2000);
+  }
 }
 
 async function loadAdminTags(filter, tabEl) {
