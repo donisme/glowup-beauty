@@ -37,6 +37,8 @@ th{background:var(--cream);padding:.75rem 1rem;text-align:left;font-size:.75rem;
 td{padding:.85rem 1rem;font-size:.875rem;border-bottom:1px solid #FAF7F2;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--cream)}
+.product-link{color:var(--espresso);font-weight:500;cursor:pointer;text-decoration:none;transition:color .2s}
+.product-link:hover{color:var(--rose-deep);text-decoration:underline}
 .status{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
 .status.pending{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
 .status.approved{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
@@ -49,6 +51,8 @@ tr:hover td{background:var(--cream)}
 .abtn.reject:hover{background:#F44336;color:white}
 .abtn.del{background:#FFEBEE;color:#C62828}
 .abtn.del:hover{background:#F44336;color:white}
+.abtn.view{background:#E8F0FF;color:#1565C0}
+.abtn.view:hover{background:#1565C0;color:white}
 .user-role{display:inline-flex;align-items:center;font-size:.72rem;font-weight:500;padding:.2rem .6rem;border-radius:999px}
 .user-role.admin{background:#FFF3E0;color:#E65100;border:1px solid #FFCC80}
 .user-role.user{background:#E8F0FF;color:#1565C0;border:1px solid #BBDEFB}
@@ -63,6 +67,46 @@ tr:hover td{background:var(--cream)}
 .not-admin .icon{font-size:4rem;margin-bottom:1rem}
 .not-admin h2{font-family:'Playfair Display',serif;margin-bottom:.5rem}
 .not-admin p{color:var(--taupe);margin-bottom:1.5rem}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:none;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{padding:1.5rem 2rem 1rem;border-bottom:1px solid var(--sand);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;position:sticky;top:0;background:white;border-radius:20px 20px 0 0;z-index:1}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.25rem;line-height:1.3}
+.modal-close{background:var(--cream);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.modal-close:hover{background:var(--sand)}
+.modal-body{padding:1.5rem 2rem 2rem}
+.modal-img{width:100%;height:220px;object-fit:cover;border-radius:12px;margin-bottom:1.25rem}
+.modal-img-placeholder{width:100%;height:220px;border-radius:12px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg,#FFE8EC,#FFD0DA)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.detail-item{background:var(--cream);border-radius:10px;padding:.75rem 1rem}
+.detail-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--taupe);margin-bottom:.3rem}
+.detail-val{font-size:.9rem;font-weight:500;color:var(--espresso)}
+.detail-full{background:var(--cream);border-radius:10px;padding:.75rem 1rem;margin-bottom:.75rem}
+.detail-full .detail-label{margin-bottom:.5rem}
+.detail-full .detail-val{font-weight:400;line-height:1.7;font-size:.875rem}
+.pro-con{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.pro-box{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:10px;padding:.75rem 1rem}
+.con-box{background:#FFEBEE;border:1px solid #FFCDD2;border-radius:10px;padding:.75rem 1rem}
+.pc-label{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.pro-box .pc-label{color:#2E7D32}
+.con-box .pc-label{color:#C62828}
+.pc-val{font-size:.875rem;line-height:1.5}
+.scores-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.75rem}
+.score-item{background:var(--cream);border-radius:8px;padding:.6rem .75rem;text-align:center}
+.score-num{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--rose-deep);display:block}
+.score-lbl{font-size:.65rem;color:var(--taupe);text-transform:uppercase;letter-spacing:.05em}
+.tags-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}
+.tag{padding:.2rem .65rem;border-radius:999px;background:white;border:1px solid var(--sand);font-size:.75rem;color:var(--taupe)}
+.modal-actions{display:flex;gap:.75rem;padding-top:1rem;border-top:1px solid var(--sand)}
+.modal-actions button{flex:1;padding:.7rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:all .2s}
+.mbtn-approve{background:#E8F5E9;color:#2E7D32}
+.mbtn-approve:hover{background:#4CAF50;color:white}
+.mbtn-reject{background:#FFEBEE;color:#C62828}
+.mbtn-reject:hover{background:#F44336;color:white}
+.mbtn-del{background:#FFEBEE;color:#C62828}
+.mbtn-del:hover{background:#F44336;color:white}
 </style>
 </head>
 <body>
@@ -77,6 +121,17 @@ tr:hover td{background:var(--cream)}
   </div>
 </nav>
 
+<!-- MODAL XEM CHI TIẾT -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Chi tiết review</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
 <div id="not-admin" class="not-admin">
   <div class="icon">🚫</div>
   <h2>Không có quyền truy cập</h2>
@@ -86,16 +141,15 @@ tr:hover td{background:var(--cream)}
 
 <div id="admin-layout" class="layout" style="display:none">
   <div class="sidebar">
-    <div class="sidebar-item active" onclick="showPage('dashboard')"><span class="sidebar-icon">📊</span> Tổng quan</div>
-    <div class="sidebar-item" onclick="showPage('reviews')"><span class="sidebar-icon">📝</span> Kiểm duyệt review</div>
-    <div class="sidebar-item" onclick="showPage('users')"><span class="sidebar-icon">👥</span> Quản lý user</div>
-    <div class="sidebar-item" onclick="showPage('comments')"><span class="sidebar-icon">💬</span> Bình luận</div>
+    <div class="sidebar-item active" onclick="showPage('dashboard',this)"><span class="sidebar-icon">📊</span> Tổng quan</div>
+    <div class="sidebar-item" onclick="showPage('reviews',this)"><span class="sidebar-icon">📝</span> Kiểm duyệt review</div>
+    <div class="sidebar-item" onclick="showPage('users',this)"><span class="sidebar-icon">👥</span> Quản lý user</div>
+    <div class="sidebar-item" onclick="showPage('comments',this)"><span class="sidebar-icon">💬</span> Bình luận</div>
   </div>
 
   <div class="content">
     <div id="flash" class="msg-flash"></div>
 
-    <!-- DASHBOARD -->
     <div id="page-dashboard" class="page active">
       <div class="section-title">Tổng quan hệ thống</div>
       <div class="stats-grid">
@@ -108,7 +162,6 @@ tr:hover td{background:var(--cream)}
       <div id="dash-pending"></div>
     </div>
 
-    <!-- REVIEWS -->
     <div id="page-reviews" class="page">
       <div class="section-title">Kiểm duyệt Review</div>
       <div class="tabs-bar">
@@ -119,13 +172,11 @@ tr:hover td{background:var(--cream)}
       <div id="reviews-table"></div>
     </div>
 
-    <!-- USERS -->
     <div id="page-users" class="page">
       <div class="section-title">Quản lý thành viên</div>
       <div id="users-table"></div>
     </div>
 
-    <!-- COMMENTS -->
     <div id="page-comments" class="page">
       <div class="section-title">Bình luận gần đây</div>
       <div id="comments-table"></div>
@@ -138,6 +189,10 @@ const db = window.supabase.createClient(
   'https://mojgtzjmscmztswhzwzv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vamd0emptc2NtenRzd2h6d3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDU5NTksImV4cCI6MjA5NDMyMTk1OX0.DPqyxvdCOyGoqwgwkkF6oRX0YngUJvlYiXVm8zWEaf0'
 );
+
+const EMOJIS = {skincare:'💆',makeup:'💄',haircare:'💇',perfume:'🌸',sunscreen:'☀️',other:'✨'};
+const REC = {yes:'👍 Có, recommend!', no:'👎 Không recommend', maybe:'🤔 Tuỳ người dùng'};
+let currentReviewId = null;
 
 window.addEventListener('load', async () => {
   const { data:{ user } } = await db.auth.getUser();
@@ -152,11 +207,11 @@ window.addEventListener('load', async () => {
   loadDashboard();
 });
 
-function showPage(name) {
+function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if (el) el.classList.add('active');
   if (name==='reviews')  loadReviews('pending');
   if (name==='users')    loadUsers();
   if (name==='comments') loadComments();
@@ -165,11 +220,11 @@ function showPage(name) {
 function flash(msg, type) {
   const el = document.getElementById('flash');
   el.textContent = msg; el.className = 'msg-flash ' + type;
-  setTimeout(() => { el.className = 'msg-flash'; }, 3000);
+  setTimeout(() => el.className = 'msg-flash', 3000);
 }
 
 async function loadDashboard() {
-  const [{ count:ra }, { count:rp }, { count:uc }, { count:cc }] = await Promise.all([
+  const [{ count:ra },{ count:rp },{ count:uc },{ count:cc }] = await Promise.all([
     db.from('reviews').select('*',{count:'exact',head:true}).eq('status','approved'),
     db.from('reviews').select('*',{count:'exact',head:true}).eq('status','pending'),
     db.from('profiles').select('*',{count:'exact',head:true}),
@@ -186,7 +241,10 @@ async function loadDashboard() {
 }
 
 async function loadReviews(status, tabEl) {
-  if (tabEl) { document.querySelectorAll('#page-reviews .tab').forEach(t=>t.classList.remove('active')); tabEl.classList.add('active'); }
+  if (tabEl) {
+    document.querySelectorAll('#page-reviews .tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+  }
   const { data } = await db.from('reviews').select('*').eq('status',status).order('created_at',{ascending:false});
   document.getElementById('reviews-table').innerHTML = data?.length ? reviewTable(data) : '<div class="empty">Không có review nào.</div>';
 }
@@ -194,32 +252,111 @@ async function loadReviews(status, tabEl) {
 function reviewTable(rows) {
   return `<div class="table-wrap"><table>
     <thead><tr><th>Sản phẩm</th><th>Thương hiệu</th><th>Điểm</th><th>Trạng thái</th><th>Ngày</th><th>Hành động</th></tr></thead>
-    <tbody>${rows.map(r=>`<tr>
-      <td><strong>${r.product_name}</strong><div style="font-size:.75rem;color:var(--taupe)">${r.title||''}</div></td>
+    <tbody>${rows.map(r => `<tr>
+      <td>
+        <span class="product-link" onclick="openModal('${r.id}')">${r.product_name}</span>
+        <div style="font-size:.75rem;color:var(--taupe)">${r.title||''}</div>
+      </td>
       <td>${r.brand||''}</td>
       <td><strong>${r.rating||0}</strong>/10</td>
       <td><span class="status ${r.status}">${r.status==='pending'?'⏳ Chờ duyệt':r.status==='approved'?'✅ Đã duyệt':'❌ Từ chối'}</span></td>
       <td style="font-size:.75rem;color:var(--taupe)">${new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
       <td><div class="action-btns">
-        ${r.status!=='approved' ? `<button class="abtn approve" onclick="updateReview('${r.id}','approved')">✅ Duyệt</button>` : ''}
-        ${r.status!=='rejected' ? `<button class="abtn reject" onclick="updateReview('${r.id}','rejected')">❌ Từ chối</button>` : ''}
-        <button class="abtn del" onclick="deleteReview('${r.id}')">🗑️ Xoá</button>
+        <button class="abtn view" onclick="openModal('${r.id}')">👁 Xem</button>
+        ${r.status!=='approved' ? `<button class="abtn approve" onclick="updateReview('${r.id}','approved')">✅</button>` : ''}
+        ${r.status!=='rejected' ? `<button class="abtn reject" onclick="updateReview('${r.id}','rejected')">❌</button>` : ''}
+        <button class="abtn del" onclick="deleteReview('${r.id}')">🗑️</button>
       </div></td>
     </tr>`).join('')}</tbody>
   </table></div>`;
 }
 
+async function openModal(id) {
+  currentReviewId = id;
+  const { data: r } = await db.from('reviews').select('*').eq('id', id).single();
+  if (!r) return;
+
+  const { data: profile } = await db.from('profiles').select('username').eq('id', r.user_id).single();
+  const uname = profile?.username || 'Ẩn danh';
+  const emoji = EMOJIS[r.category] || '✨';
+  const date  = new Date(r.created_at).toLocaleDateString('vi-VN');
+
+  document.getElementById('modal-title').textContent = r.product_name + ' — ' + r.brand;
+
+  document.getElementById('modal-body').innerHTML = `
+    ${r.image_url
+      ? `<img class="modal-img" src="${r.image_url}" alt="${r.product_name}" onerror="this.outerHTML='<div class=modal-img-placeholder>${emoji}</div>'">`
+      : `<div class="modal-img-placeholder">${emoji}</div>`}
+
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Sản phẩm</div><div class="detail-val">${r.product_name}</div></div>
+      <div class="detail-item"><div class="detail-label">Thương hiệu</div><div class="detail-val">${r.brand||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Danh mục</div><div class="detail-val">${r.category||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Giá</div><div class="detail-val">${r.price||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Điểm tổng thể</div><div class="detail-val" style="color:var(--rose-deep);font-size:1.1rem">${r.rating||0}/10</div></div>
+      <div class="detail-item"><div class="detail-label">Người viết</div><div class="detail-val">${uname}</div></div>
+      <div class="detail-item"><div class="detail-label">Ngày đăng</div><div class="detail-val">${date}</div></div>
+      <div class="detail-item"><div class="detail-label">Recommend</div><div class="detail-val">${REC[r.recommend]||'—'}</div></div>
+    </div>
+
+    ${r.title ? `<div class="detail-full"><div class="detail-label">Tiêu đề</div><div class="detail-val" style="font-weight:500;font-size:1rem">${r.title}</div></div>` : ''}
+
+    <div class="detail-full">
+      <div class="detail-label">Nội dung review</div>
+      <div class="detail-val">${(r.content||'').replace(/\n/g,'<br>')}</div>
+    </div>
+
+    ${(r.pros||r.cons) ? `<div class="pro-con">
+      ${r.pros ? `<div class="pro-box"><div class="pc-label">✅ Ưu điểm</div><div class="pc-val">${r.pros}</div></div>` : ''}
+      ${r.cons ? `<div class="con-box"><div class="pc-label">❌ Nhược điểm</div><div class="pc-val">${r.cons}</div></div>` : ''}
+    </div>` : ''}
+
+    ${(r.score_effect||r.score_texture||r.score_value||r.score_design) ? `
+    <div style="margin-bottom:.75rem;font-size:.78rem;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em">Điểm tiêu chí</div>
+    <div class="scores-grid">
+      ${r.score_effect  ? `<div class="score-item"><span class="score-num">${r.score_effect}</span><span class="score-lbl">Hiệu quả</span></div>` : ''}
+      ${r.score_texture ? `<div class="score-item"><span class="score-num">${r.score_texture}</span><span class="score-lbl">Kết cấu</span></div>` : ''}
+      ${r.score_value   ? `<div class="score-item"><span class="score-num">${r.score_value}</span><span class="score-lbl">Giá trị</span></div>` : ''}
+      ${r.score_design  ? `<div class="score-item"><span class="score-num">${r.score_design}</span><span class="score-lbl">Bao bì</span></div>` : ''}
+    </div>` : ''}
+
+    ${r.tags?.length ? `<div class="tags-row">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+
+    <div class="modal-actions">
+      ${r.status!=='approved' ? `<button class="mbtn-approve" onclick="updateReview('${r.id}','approved');closeModalDirect()">✅ Duyệt bài</button>` : ''}
+      ${r.status!=='rejected' ? `<button class="mbtn-reject" onclick="updateReview('${r.id}','rejected');closeModalDirect()">❌ Từ chối</button>` : ''}
+      <button class="mbtn-del" onclick="deleteReview('${r.id}');closeModalDirect()">🗑️ Xoá bài</button>
+    </div>`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 async function updateReview(id, status) {
   const { error } = await db.from('reviews').update({ status }).eq('id', id);
   if (error) flash('Lỗi: ' + error.message, 'err');
-  else { flash(status==='approved' ? '✅ Đã duyệt review!' : '❌ Đã từ chối review!', 'ok'); loadDashboard(); loadReviews(status); }
+  else {
+    flash(status==='approved' ? '✅ Đã duyệt!' : '❌ Đã từ chối!', 'ok');
+    loadDashboard();
+    const activeTab = document.querySelector('#page-reviews .tab.active');
+    if (document.getElementById('page-reviews').classList.contains('active')) loadReviews(status);
+  }
 }
 
 async function deleteReview(id) {
   if (!confirm('Bạn chắc chắn muốn xoá review này?')) return;
   const { error } = await db.from('reviews').delete().eq('id', id);
   if (error) flash('Lỗi: ' + error.message, 'err');
-  else { flash('🗑️ Đã xoá review!', 'ok'); loadDashboard(); }
+  else { flash('🗑️ Đã xoá!', 'ok'); loadDashboard(); }
 }
 
 async function loadUsers() {
@@ -233,7 +370,9 @@ async function loadUsers() {
       <td><span class="user-role ${u.role}">${u.role==='admin'?'⚙️ Admin':'👤 User'}</span></td>
       <td style="font-size:.75rem;color:var(--taupe)">${new Date(u.created_at).toLocaleDateString('vi-VN')}</td>
       <td><div class="action-btns">
-        ${u.role!=='admin' ? `<button class="abtn approve" onclick="setRole('${u.id}','admin')">⬆️ Thăng Admin</button>` : `<button class="abtn reject" onclick="setRole('${u.id}','user')">⬇️ Hạ User</button>`}
+        ${u.role!=='admin'
+          ? `<button class="abtn approve" onclick="setRole('${u.id}','admin')">⬆️ Thăng Admin</button>`
+          : `<button class="abtn reject" onclick="setRole('${u.id}','user')">⬇️ Hạ User</button>`}
       </div></td>
     </tr>`).join('')}</tbody>
   </table></div>`;
@@ -241,8 +380,8 @@ async function loadUsers() {
 
 async function setRole(id, role) {
   const { error } = await db.from('profiles').update({ role }).eq('id', id);
-  if (error) flash('Lỗi: ' + error.message, 'err');
-  else { flash('✅ Đã cập nhật quyền!', 'ok'); loadUsers(); }
+  if (error) flash('Lỗi: '+error.message,'err');
+  else { flash('✅ Đã cập nhật quyền!','ok'); loadUsers(); }
 }
 
 async function loadComments() {
@@ -250,10 +389,10 @@ async function loadComments() {
   const wrap = document.getElementById('comments-table');
   if (!data?.length) { wrap.innerHTML='<div class="empty">Chưa có bình luận nào.</div>'; return; }
   wrap.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Nội dung</th><th>Review ID</th><th>Ngày</th><th>Hành động</th></tr></thead>
+    <thead><tr><th>Nội dung</th><th>Review</th><th>Ngày</th><th>Hành động</th></tr></thead>
     <tbody>${data.map(c=>`<tr>
       <td>${c.content}</td>
-      <td style="font-size:.72rem;color:var(--taupe)">${c.review_id?.slice(0,8)}...</td>
+      <td><button class="abtn view" onclick="openModal('${c.review_id}')">👁 Xem review</button></td>
       <td style="font-size:.75rem;color:var(--taupe)">${new Date(c.created_at).toLocaleDateString('vi-VN')}</td>
       <td><button class="abtn del" onclick="deleteComment('${c.id}')">🗑️ Xoá</button></td>
     </tr>`).join('')}</tbody>
@@ -268,6 +407,8 @@ async function deleteComment(id) {
 }
 
 async function logout() { await db.auth.signOut(); location.href = 'auth.html'; }
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModalDirect(); });
 </script>
 </body>
 </html>
