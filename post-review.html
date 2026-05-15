@@ -209,8 +209,8 @@ input[type=range]{flex:1;padding:0;border:none;background:transparent;accent-col
 
   <div id="success-state" class="success-state card">
     <div class="success-icon">🎉</div>
-    <div class="success-title">Review đã được gửi!</div>
-    <div class="success-sub">Cảm ơn bạn! Review đang chờ admin kiểm duyệt.<br>Sau khi duyệt sẽ hiển thị trên trang chủ.</div>
+    <div class="success-title" id="success-title">Review đã được gửi!</div>
+    <div class="success-sub" id="success-sub">Cảm ơn bạn! Review đang chờ admin kiểm duyệt.<br>Sau khi duyệt sẽ hiển thị trên trang chủ.</div>
     <div class="sactions">
       <a href="index.html" class="sa-p">🏠 Về trang chủ</a>
       <a href="post-review.html" class="sa-s">✍️ Viết tiếp</a>
@@ -307,14 +307,21 @@ window.addEventListener('load', async () => {
   if (!user) { document.getElementById('not-logged').style.display = 'block'; return; }
   currentUser = user;
   document.getElementById('review-form').style.display = 'block';
-  const { data: p } = await db.from('profiles').select('username').eq('id', user.id).single();
-  if (p) document.getElementById('nav-user').textContent = '👤 ' + p.username;
+  const { data: p } = await db.from('profiles').select('username,role').eq('id', user.id).single();
+  if (p) {
+    document.getElementById('nav-user').textContent = '👤 ' + p.username;
+    if (p.role === 'admin') {
+      isAdmin = true;
+      document.getElementById('sbtn').textContent = '🚀 Đăng review ngay (Admin)';
+      document.getElementById('sbtn').style.background = 'var(--rose-deep)';
+    }
+  }
   await loadExisting();
   await loadTags();
 });
 
 let allTags = [];
-
+let isAdmin = false;
 async function loadTags() {
   const { data } = await db.from('tags').select('*').order('is_default', {ascending:false}).order('name');
   allTags = data || [];
@@ -420,7 +427,7 @@ async function submit() {
     score_value:   parseInt(document.getElementById('r-val').value),
     score_design:  parseInt(document.getElementById('r-des').value),
     recommend: document.getElementById('rec').value,
-    tags: selectedTags, image_url: imageUrl, status: 'pending'
+    tags: selectedTags, image_url: imageUrl, status: isAdmin ? 'approved' : 'pending'
   });
 
   if (error) {
@@ -429,6 +436,10 @@ async function submit() {
   } else {
     document.getElementById('review-form').style.display = 'none';
     document.getElementById('success-state').style.display = 'block';
+    document.getElementById('success-title').textContent = isAdmin ? '🎉 Review đã được đăng!' : '🎉 Review đã được gửi!';
+    document.getElementById('success-sub').textContent = isAdmin
+      ? 'Review của bạn đã được đăng công khai ngay lập tức.'
+      : 'Cảm ơn bạn! Review đang chờ admin kiểm duyệt.\nSau khi duyệt sẽ hiển thị trên trang chủ.';
     window.scrollTo({top:0,behavior:'smooth'});
   }
 }
