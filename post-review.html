@@ -28,6 +28,17 @@ label span{color:var(--rose-deep)}
 input[type=text],input[type=number],select,textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--sand);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--espresso);background:white;outline:none;transition:border-color .2s;appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--rose-deep)}
 input::placeholder,textarea::placeholder{color:#C4B5AA}
+.ac-wrap{position:relative}
+.ac-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:1.5px solid var(--rose-deep);border-radius:10px;box-shadow:0 8px 24px rgba(59,42,42,.1);z-index:20;display:none;max-height:200px;overflow-y:auto}
+.ac-dropdown.open{display:block}
+.ac-item{padding:.65rem 1rem;font-size:.875rem;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--cream)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:var(--cream)}
+.ac-item strong{color:var(--rose-deep)}
+.ac-item .ac-sub{font-size:.75rem;color:var(--taupe);margin-top:.1rem}
+.ac-new{padding:.65rem 1rem;font-size:.875rem;color:var(--taupe);cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:background .15s}
+.ac-new:hover{background:var(--cream)}
+.ac-new span{color:var(--rose-deep);font-weight:500}
 textarea{resize:vertical;min-height:140px;line-height:1.6}
 .tags-wrap{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
 .tag-chip{padding:.3rem .85rem;border-radius:999px;font-size:.78rem;font-weight:500;border:1.5px solid var(--sand);background:white;color:var(--taupe);cursor:pointer;transition:all .15s}
@@ -99,8 +110,20 @@ input[type=range]{flex:1;padding:0;border:none;background:transparent;accent-col
     <div class="card">
       <div class="card-title">📦 Thông tin sản phẩm</div>
       <div class="form-row">
-        <div class="fg"><label>Tên sản phẩm <span>*</span></label><input type="text" id="pname" placeholder="VD: Pillow Talk Lipstick"></div>
-        <div class="fg"><label>Thương hiệu <span>*</span></label><input type="text" id="brand" placeholder="VD: Charlotte Tilbury"></div>
+        <div class="fg">
+          <label>Tên sản phẩm <span>*</span></label>
+          <div class="ac-wrap" id="ac-pname-wrap">
+            <input type="text" id="pname" placeholder="VD: Pillow Talk Lipstick" autocomplete="off" oninput="acSearch('pname')" onfocus="acSearch('pname')" onblur="setTimeout(()=>closeAc('pname'),200)">
+            <div class="ac-dropdown" id="ac-pname"></div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Thương hiệu <span>*</span></label>
+          <div class="ac-wrap" id="ac-brand-wrap">
+            <input type="text" id="brand" placeholder="VD: Charlotte Tilbury" autocomplete="off" oninput="acSearch('brand')" onfocus="acSearch('brand')" onblur="setTimeout(()=>closeAc('brand'),200)">
+            <div class="ac-dropdown" id="ac-brand"></div>
+          </div>
+        </div>
       </div>
       <div class="form-row">
         <div class="fg"><label>Danh mục <span>*</span></label>
@@ -200,6 +223,81 @@ const db = window.supabase.createClient(
 let currentUser = null;
 let selectedTags = [];
 
+let allProducts = [];
+let allBrands = [];
+
+async function loadExisting() {
+  const { data } = await db.from('reviews').select('product_name, brand, category').eq('status','approved');
+  if (!data) return;
+  const pMap = {}, bSet = new Set();
+  data.forEach(r => {
+    const key = r.product_name?.toLowerCase();
+    if (key && !pMap[key]) pMap[key] = r;
+    if (r.brand) bSet.add(r.brand);
+  });
+  allProducts = Object.values(pMap);
+  allBrands   = [...bSet];
+}
+
+function acSearch(field) {
+  const input  = document.getElementById(field === 'pname' ? 'pname' : 'brand');
+  const dropdown = document.getElementById('ac-' + (field === 'pname' ? 'pname' : 'brand'));
+  const q = input.value.trim().toLowerCase();
+
+  if (field === 'pname') {
+    const matches = q
+      ? allProducts.filter(p => p.product_name.toLowerCase().includes(q))
+      : allProducts.slice(0, 8);
+
+    if (!matches.length && !q) { closeAc('pname'); return; }
+
+    dropdown.innerHTML = matches.slice(0,8).map(p => `
+      <div class="ac-item" onmousedown="pickProduct('${p.product_name.replace(/'/g,"\\'")}','${(p.brand||'').replace(/'/g,"\\'")}','${p.category||''}')">
+        <div><strong>${highlight(p.product_name, q)}</strong></div>
+        <div class="ac-sub">${p.brand||''} ${p.category ? '· ' + p.category : ''}</div>
+      </div>`).join('') +
+      (q ? `<div class="ac-new" onmousedown="closeAc('pname')">➕ Thêm mới: <span>"${input.value}"</span></div>` : '');
+
+    dropdown.classList.add('open');
+  } else {
+    const matches = q
+      ? allBrands.filter(b => b.toLowerCase().includes(q))
+      : allBrands.slice(0, 8);
+
+    if (!matches.length && !q) { closeAc('brand'); return; }
+
+    dropdown.innerHTML = matches.slice(0,8).map(b => `
+      <div class="ac-item" onmousedown="pickBrand('${b.replace(/'/g,"\\'")}')">
+        <strong>${highlight(b, q)}</strong>
+      </div>`).join('') +
+      (q ? `<div class="ac-new" onmousedown="closeAc('brand')">➕ Thêm mới: <span>"${input.value}"</span></div>` : '');
+
+    dropdown.classList.add('open');
+  }
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  return text.replace(new RegExp(`(${q})`, 'gi'), '<mark style="background:var(--rose);color:white;border-radius:3px;padding:0 2px">$1</mark>');
+}
+
+function pickProduct(name, brand, cat) {
+  document.getElementById('pname').value = name;
+  if (brand) document.getElementById('brand').value = brand;
+  if (cat)   document.getElementById('cat').value   = cat;
+  closeAc('pname');
+}
+
+function pickBrand(brand) {
+  document.getElementById('brand').value = brand;
+  closeAc('brand');
+}
+
+function closeAc(field) {
+  const dropdown = document.getElementById('ac-' + (field === 'pname' ? 'pname' : 'brand'));
+  if (dropdown) dropdown.classList.remove('open');
+}
+
 window.addEventListener('load', async () => {
   const { data:{ user } } = await db.auth.getUser();
   if (!user) { document.getElementById('not-logged').style.display = 'block'; return; }
@@ -207,6 +305,7 @@ window.addEventListener('load', async () => {
   document.getElementById('review-form').style.display = 'block';
   const { data: p } = await db.from('profiles').select('username').eq('id', user.id).single();
   if (p) document.getElementById('nav-user').textContent = '👤 ' + p.username;
+  await loadExisting();
 });
 
 function tog(el, tag) {
