@@ -26,7 +26,7 @@ nav{background:var(--cream);border-bottom:1px solid var(--sand);padding:0 2rem;h
 .msg-row{display:flex;gap:.4rem;align-items:flex-end}
 .msg-row.own{flex-direction:row-reverse}
 .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:.85rem;color:white;font-family:'Playfair Display',serif;flex-shrink:0}
-.bubble{max-width:65%;background:var(--cream);border-radius:16px 16px 16px 4px;padding:.6rem .9rem;font-size:.875rem;line-height:1.5;border:1px solid var(--sand);word-break:break-word;overflow-wrap:anywhere;white-space:normal}
+.bubble{display:inline-block;max-width:100%;background:var(--cream);border-radius:16px 16px 16px 4px;padding:.6rem .9rem;font-size:.875rem;line-height:1.5;border:1px solid var(--sand);word-break:break-word;overflow-wrap:anywhere}
 .msg-row.own .bubble{background:var(--espresso);color:white;border-radius:16px 16px 4px 16px;border-color:var(--espresso)}
 .msg-meta{font-size:.7rem;color:var(--taupe);margin-bottom:.2rem}
 .msg-row.own .msg-meta{text-align:right}
@@ -142,7 +142,7 @@ function renderMsg(m) {
   const time  = new Date(m.created_at).toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
   return `<div class="msg-row ${isOwn?'own':''}">
     <div class="av">${uname.charAt(0).toUpperCase()}</div>
-    <div>
+    <div style="max-width:calc(100% - 48px);min-width:0">
       <div class="msg-meta">${isOwn ? time : uname + ' · ' + time}</div>
       <div class="bubble">${escHtml(m.content)}</div>
     </div>
